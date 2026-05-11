@@ -70,8 +70,8 @@ See [CLAUDE.md](CLAUDE.md) for the full developer guide.
 ## Related Projects
 
 - **[hitl-ml](https://github.com/lazToum/hitl-ml)** — The HITL Machine Learning handbook that contextualizes this project
-- **[wid](https://github.com/waldiez/wid)** — WID identifier library (sibling dep at `../wid`)
-- **[@waldiez/player](https://github.com/waldiez/player)** — Source of `apps/player/`
+- **[waldiez/wid](https://github.com/waldiez/wid)** — Hybrid logical clock identifiers; every session, event, and plugin action is stamped with a WID
+- **[waldiez/player](https://github.com/waldiez/player)** — Media player that lives in `apps/player/`; upstream for that subtree
 
 ---
 
