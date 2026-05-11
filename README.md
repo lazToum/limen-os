@@ -54,7 +54,7 @@ make setup      # Install all deps (Rust, Bun, Flutter)
 make dev        # Start Tauri shell + TUI watcher + mobile emulator
 ```
 
-See [CLAUDE.md](CLAUDE.md) for the full developer guide.
+See [DEVELOPER.md](DEVELOPER.md) for the full developer guide.
 
 ---
 
