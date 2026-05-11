@@ -4,19 +4,19 @@
 [![GitLab](https://img.shields.io/badge/GitLab-lazToum%2Flimen--os-FC6D26?logo=gitlab)](https://gitlab.com/lazToum/limen-os)
 [![Site](https://img.shields.io/badge/limen--os.io-online-2b3a8f)](https://limen-os.io)
 
-A voice-first, AI-native desktop shell. Built on Tauri v2, Babylon.js, and multi-model AI routing.
+A design and codebase for a voice-first, AI-native desktop shell. Early-stage. Built on Tauri v2, Babylon.js, and multi-model AI routing.
 
 ---
 
 ## What Is Limen OS?
 
-Limen OS is a supercharged display shell — GNOME/Wayland augmented with voice, gesture, and AI — designed around three principles:
+An opinionated bet on what a desktop shell could look like if voice and AI were designed in from the start — not bolted on. The three design principles it's being built around:
 
-1. **Voice-first** — camera and microphone are primary inputs; keyboard and mouse are fallback
-2. **AI-native** — every surface is LLM-augmented with multi-model routing (Claude → GPT-4 → Gemini → Deepseek → Groq)
-3. **Beautiful & lightweight** — Babylon.js WebGL/WebGPU rendering, fluid animations, no visual debt
+1. **Voice-first** — camera and microphone as primary inputs; keyboard and mouse as fallback
+2. **AI-native** — multi-model routing (Claude → GPT-4 → Gemini → Deepseek → Groq) throughout, not as a feature
+3. **Beautiful & lightweight** — Babylon.js WebGL/WebGPU rendering; no visual debt allowed
 
-It runs as a **Tauri desktop app**, a **browser kiosk**, a **Ratatui TUI** (SSH), and has a **Flutter mobile companion**.
+The target runtime is Tauri v2 on Linux/Wayland, plus a browser kiosk mode, a Ratatui TUI over SSH, and a Flutter mobile companion. Most of this is still being built.
 
 ---
 
