@@ -1,0 +1,39 @@
+[Unit]
+Description=LIMEN OS Voice Daemon (mic → VAD → Whisper → IPC)
+Documentation=https://github.com/waldiez/limen-os
+After=network.target synapsd.service
+Requires=synapsd.service
+
+[Service]
+Type=simple
+User=%i
+Group=audio
+
+# Binary installed by `make install` or `cargo install --path crates/limen-voice`
+ExecStart=/usr/local/bin/limen-voiced
+
+# Restart on any failure; wait 5s before retry
+Restart=on-failure
+RestartSec=5s
+
+# Environment — override in /etc/limen/voice.env or ~/.config/limen/voice.env
+EnvironmentFile=-/etc/limen/voice.env
+EnvironmentFile=-%h/.config/limen/voice.env
+
+Environment=LIMEN_LOG=limen_voice=info
+Environment=LIMEN_WAKE_WORD=hey limen
+Environment=LIMEN_VAD_THRESH=0.01
+Environment=LIMEN_IPC_SOCK=/run/limen/core.sock
+
+# Give the process access to audio devices
+SupplementaryGroups=audio pulse-access
+
+# Runtime dir for the socket
+RuntimeDirectory=limen
+RuntimeDirectoryMode=0755
+
+# Limit memory footprint (adjust if using large Whisper model)
+MemoryMax=512M
+
+[Install]
+WantedBy=default.target

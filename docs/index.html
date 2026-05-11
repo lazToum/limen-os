@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LIMEN OS — Documentation Hub</title>
+  <style>
+    /* Inline critical styles so the hub is self-contained */
+    :root {
+      --accent:   #6366f1;
+      --accent-2: #8b5cf6;
+      --accent-3: #ec4899;
+      --bg:       #0d0f1a;
+      --bg-card:  #13172a;
+      --border:   rgba(99,102,241,0.18);
+      --text:     #c9d1e8;
+      --text-dim: #6b7399;
+      --text-head:#e8ecff;
+      --link:     #818cf8;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      font-size: 15px;
+      line-height: 1.65;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    a { color: var(--link); text-decoration: none; }
+    a:hover { color: #a5b4fc; }
+
+    /* ── Header ── */
+    .hero {
+      padding: 4rem 2rem 3rem;
+      text-align: center;
+      background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(99,102,241,0.18), transparent);
+      border-bottom: 1px solid var(--border);
+    }
+    .hero h1 {
+      font-size: 2.6rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #818cf8, #c4b5fd, #f9a8d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.6rem;
+    }
+    .hero p {
+      font-size: 1.05rem;
+      color: var(--text-dim);
+      max-width: 540px;
+      margin: 0 auto;
+    }
+    .hero .badge {
+      display: inline-block;
+      margin-top: 1.2rem;
+      padding: 0.3rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Layout ── */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 3rem 2rem 6rem;
+    }
+    section { margin-bottom: 3rem; }
+    .section-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 1rem;
+      padding-left: 0.1rem;
+    }
+
+    /* ── Card grid ── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.2rem 1.4rem;
+      transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+      cursor: default;
+    }
+    .card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(99,102,241,0.12);
+    }
+    .card-icon {
+      font-size: 1.3rem;
+      margin-bottom: 0.6rem;
+    }
+    .card a {
+      font-weight: 600;
+      color: var(--text-head);
+      font-size: 0.97rem;
+      display: block;
+      margin-bottom: 0.35rem;
+    }
+    .card a:hover { color: var(--link); }
+    .card p {
+      font-size: 0.83rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      border-top: 1px solid var(--border);
+    }
+    footer code {
+      background: rgba(99,102,241,0.1);
+      padding: 0.1em 0.4em;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+
+    @media (max-width: 640px) {
+      .hero h1 { font-size: 2rem; }
+      .grid { grid-template-columns: 1fr; }
+      main { padding: 2rem 1rem 4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="hero">
+  <h1>LIMEN OS</h1>
+  <p>Voice-first. AI-native. Beautiful. A new operating system paradigm.</p>
+  <span class="badge">Documentation Hub · waldiez/limen-os</span>
+</header>
+
+<main>
+
+  <section>
+    <div class="section-title">Foundation &amp; Vision</div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-icon">🌌</div>
+        <a href="PHILOSOPHY.html">Limen Philosophy</a>
+        <p>The Grandmother Test, TRANSPORT input hierarchy, failure modes as features, and the n-year relationship.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">👵</div>
+        <a href="guides/GRANDMOTHER_GUIDE.html">The Grandmother's Guide</a>
+        <p>Our core design constraint: as approachable as a washing machine, as capable as a smartphone.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🏗️</div>
+        <a href="architecture/ARCHITECTURE.html">Architecture Deep Dive</a>
+        <p>Five interaction modalities, component communication, voice intent schema, plugin system, and performance targets.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🚀</div>
+        <a href="guides/GETTING_STARTED.html">Getting Started</a>
+        <p>Prerequisites, <code>make dev</code>, project layout, adding apps, sending IPC commands, running tests.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title">Visual &amp; Interaction Design</div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-icon">🎨</div>
+        <a href="design/paradigms.html">Paradigm Schema</a>
+        <p>Full JSON schema for behavioral themes: visual, sound, behavior, motion, accessibility. All 7 built-in paradigms documented.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎬</div>
+        <a href="design/scenes.html">Scene Specification</a>
+        <p>Babylon.js scene inventory — Home, Greeter, Launcher, Ambient, Voice, Focus — with state, transitions, and memory budget.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title">Applications &amp; Interfaces</div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-icon">🖥️</div>
+        <a href="apps/shell-frontend.html">Shell (Babylon.js + React)</a>
+        <p>The visual 3D/2D frontend, state management with Zustand, window system, and Tauri IPC bridge.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📱</div>
+        <a href="apps/mobile-companion.html">Mobile Companion</a>
+        <p>Phone-as-remote, remote mic relay, WebRTC pairing, and second-screen protocol.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⌨️</div>
+        <a href="apps/tui-interface.html">TUI Interface</a>
+        <p>Full feature parity via SSH/terminal. Ratatui + Crossterm. The grandmother's "give me the keyboard" mode.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title">Core Crates — The Internals</div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-icon">❤️</div>
+        <a href="crates/limen-core.html">limen-core</a>
+        <p>The system heart: Event Bus, Sessions, IPC server, Plugin Registry, WID tagging.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">👂</div>
+        <a href="crates/limen-voice.html">limen-voice</a>
+        <p>The ears: Whisper ONNX STT, VAD, wake-word filter, Kokoro/Piper TTS pipeline.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🧠</div>
+        <a href="crates/limen-ai.html">limen-ai</a>
+        <p>The brain: multi-model intent router — Claude → GPT-4 → Gemini → Deepseek → Groq.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🖼️</div>
+        <a href="crates/limen-display.html">limen-display</a>
+        <p>Window stacking, input routing, Wayland/X11 bridge, display configuration.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title">API Reference</div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-icon">🗺️</div>
+        <a href="api/OVERVIEW.html">API Overview</a>
+        <p>How voice, AI, core, and shell talk to each other. Interaction flow maps.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔌</div>
+        <a href="api/IPC.html">Daemon IPC Protocol</a>
+        <p>Unix socket message format, command schema, event stream, error codes.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔊</div>
+        <a href="api/VOICE.html">Voice Intent Schemas</a>
+        <p>Structured intent JSON, utterance mappings, confidence scoring, STT modes.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🧩</div>
+        <a href="api/PLUGINS.html">Plugin API</a>
+        <p>WASM plugin SDK, manifest format, permissions model, widget update events.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🆔</div>
+        <a href="api/WID.html">WID Integration</a>
+        <p>Waldiez ID format, HLC causality, event tagging, correlation IDs for debugging.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title">Technical &amp; Operations</div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-icon">⚙️</div>
+        <a href="technical/deployment-ops.html">Deployment &amp; Ops</a>
+        <p>Systemd units, HAOS container layout, <code>make deploy</code>, logs, hardware targets, troubleshooting.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🕐</div>
+        <a href="technical/hlc-wid-spec.html">WID/HLC Specification</a>
+        <p>Formal causality ordering, Hybrid Logical Clock, collision resistance, distributed event tagging.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔒</div>
+        <a href="technical/security-permissions.html">Security Model</a>
+        <p>WASM sandboxing, IPC capability locking, privacy guarantees, plugin permission tiers.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>&copy; 2026 Waldiez — Part of the <code>patato5</code> ecosystem &nbsp;·&nbsp;
+  <a href="https://github.com/waldiez/limen-os">GitHub</a></p>
+</footer>
+
+</body>
+</html>

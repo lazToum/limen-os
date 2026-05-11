@@ -1,0 +1,226 @@
+/* Themed Lobby Shared Styles */
+
+.themed-lobby-container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.themed-lobby-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  outline: none;
+}
+
+/* Loading */
+.themed-lobby-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: inherit;
+  z-index: 200;
+  gap: 1.5rem;
+}
+
+.themed-lobby-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--accent-color, #7877c6);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.themed-lobby-loading p {
+  font-family: "Playfair Display", serif;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.1em;
+}
+
+/* Header */
+.themed-lobby-header {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 50;
+}
+
+.themed-lobby-header h1 {
+  font-family: "Playfair Display", serif;
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.1em;
+  margin: 0 0 0.3rem 0;
+}
+
+.themed-lobby-header p {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+/* Back Button */
+.themed-lobby-back {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 100;
+}
+
+.themed-lobby-back button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 10px 18px;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.themed-lobby-back button:hover {
+  background: rgba(0, 0, 0, 0.6);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.themed-lobby-back button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Experience Info Panel */
+.themed-lobby-info {
+  position: absolute;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #f5f5f0;
+  padding: 24px 36px;
+  border-radius: 12px;
+  text-align: center;
+  z-index: 100;
+  min-width: 280px;
+  max-width: min(90%, 450px);
+  animation: infoSlideUp 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.themed-lobby-info h2 {
+  font-family: "Playfair Display", serif;
+  font-size: 1.3rem;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+  color: var(--accent-color, #7877c6);
+}
+
+.themed-lobby-info p {
+  font-size: 0.9rem;
+  opacity: 0.75;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.themed-lobby-info .cta {
+  display: inline-block;
+  padding: 10px 24px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.05)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #f5f5f0;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+@keyframes infoSlideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Keyboard hints */
+.themed-lobby-hints {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  background: rgba(0, 0, 0, 0.5);
+  color: rgba(255, 255, 255, 0.4);
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  z-index: 50;
+}
+
+.themed-lobby-hints kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  font-family: monospace;
+  margin: 0 3px;
+}
+
+/* Theme-specific backgrounds */
+.themed-lobby-container.celestial {
+  background: linear-gradient(180deg, #020206 0%, #0a0a1a 100%);
+  --accent-color: #9989ff;
+}
+
+.themed-lobby-container.gallery {
+  background: linear-gradient(180deg, #1a1816 0%, #0d0c0a 100%);
+  --accent-color: #d4b896;
+}
+
+.themed-lobby-container.islands {
+  background: linear-gradient(180deg, #0a1520 0%, #051015 100%);
+  --accent-color: #4de8d8;
+}
+
+.themed-lobby-container.tree {
+  background: linear-gradient(180deg, #050a05 0%, #020502 100%);
+  --accent-color: #66e650;
+}
+
+/* Transition out */
+.themed-lobby-container.exiting {
+  animation: lobbyExit 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+@keyframes lobbyExit {
+  to {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}

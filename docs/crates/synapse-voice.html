@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>LIMEN-VOICE — The System Ears</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+<a href='../index.html' class='back-link'>← Back to Hub</a>
+<header id="title-block-header">
+<h1 class="title">LIMEN-VOICE — The System Ears</h1>
+</header>
+<h1 id="limen-voice-the-system-ears">LIMEN-VOICE — The System
+Ears</h1>
+<p><code>limen-voice</code> (<code>voiced</code>) is the voice
+input/output engine. It handles everything from the initial microphone
+capture to the final text-to-speech response.</p>
+<hr />
+<h2 id="the-voice-pipeline">1. The Voice Pipeline</h2>
+<p>A single voice command follows this lifecycle:</p>
+<pre class="text"><code>Audio Capture (Microphone)
+  ↓
+VAD (Voice Activity Detection)
+  ↓
+Whisper STT (Speech-to-Text)
+  ↓
+(Transcript sent to limen-ai)</code></pre>
+<hr />
+<h2 id="audio-capture-vad">2. Audio Capture &amp; VAD</h2>
+<p><code>limen-voice</code> continuously monitors the system’s primary
+audio input.</p>
+<ul>
+<li><strong>VAD (Silero)</strong>: Instead of constant transcription, it
+uses a lightweight VAD model to detect when a human is actually
+speaking.</li>
+<li><strong>Wake Word</strong>: Only when the system detects its name
+(“Hey Limen”) does it begin sending audio to the high-power STT
+engine.</li>
+</ul>
+<hr />
+<h2 id="transcription-whisper-onnx">3. Transcription (Whisper ONNX)</h2>
+<p>We use the OpenAI Whisper model, but optimized for local
+performance.</p>
+<ul>
+<li><strong>Engine</strong>: ONNX Runtime (CPU or GPU accelerated).</li>
+<li><strong>Quantization</strong>: INT8 for speed and low memory
+footprint.</li>
+<li><strong>Latency Target</strong>: Transcription of a 5-second clip
+must finish in under 500ms.</li>
+</ul>
+<hr />
+<h2 id="text-to-speech-tts">4. Text-to-Speech (TTS)</h2>
+<p>When the AI has a response, <code>voiced</code> handles the
+playback.</p>
+<ul>
+<li><strong>Engines</strong>:
+<ul>
+<li><strong>Piper</strong>: Our default, high-speed local neural
+TTS.</li>
+<li><strong>Sherpa-ONNX</strong>: Alternative engine for specific
+language models.</li>
+</ul></li>
+<li><strong>Queueing</strong>: If multiple apps try to speak at once,
+the core event bus prioritizes them based on urgency (e.g., an alarm
+over a weather update).</li>
+</ul>
+<hr />
+<h2 id="privacy-security">5. Privacy &amp; Security</h2>
+<p><code>limen-voice</code> is a <strong>local-first</strong>
+engine.</p>
+<ul>
+<li><strong>Offline Mode</strong>: No audio data is sent to the cloud by
+default.</li>
+<li><strong>Mute Guarantee</strong>: A physical hardware switch or
+systemd override can forcibly disable microphone access at the driver
+level.</li>
+</ul>
+</body>
+</html>

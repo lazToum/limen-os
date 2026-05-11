@@ -1,0 +1,36 @@
+# LIMEN OS — Virtual framebuffer (Xvfb :99)
+#
+# Provides a headless X display so Chromium kiosk or the Tauri binary
+# can render on a VM/server with no physical display.
+#
+# Requires: xvfb   (apt install xvfb)
+#
+# Install:
+#   cp limen-xvfb.service /etc/systemd/system/
+#   systemctl daemon-reload
+#   systemctl enable --now limen-xvfb
+
+[Unit]
+Description=LIMEN OS virtual display (Xvfb :99)
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/Xvfb :99 \
+    -screen 0 1920x1080x24 \
+    -ac \
+    +extension GLX \
+    +extension RANDR \
+    +render \
+    -nolisten tcp \
+    -noreset
+
+Restart=on-failure
+RestartSec=3s
+
+# Run as the limen user so kiosk/tauri services can connect without XAUTHORITY juggling
+User=limen
+Group=limen
+
+[Install]
+WantedBy=multi-user.target

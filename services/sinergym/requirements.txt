@@ -1,0 +1,7 @@
+fastapi>=0.135.1
+uvicorn>=0.42.0
+sse-starlette>=3.3.2
+pydantic>=2.12.5
+# opyplus@ git+https://github.com/AlejandroCN7/opyplus.git@master
+# sinergym @ git+https://github.com/ugr-sail/sinergym.git@v3.11.0
+sinergym==3.11.0

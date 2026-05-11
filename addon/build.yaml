@@ -1,0 +1,23 @@
+# LIMEN OS — Home Assistant Add-on Build Config
+# https://developers.home-assistant.io/docs/add-ons/configuration#add-on-extended-build
+#
+# The Supervisor injects BUILD_FROM automatically during `ha addon build`.
+# These base images are the official HA Debian bases per architecture —
+# they give us apt, ca-certificates, bash, curl, and the HA S6-overlay.
+---
+build_from:
+  # Debian 12 (Bookworm) bases — match HAOS Debian container environment
+  amd64: "homeassistant/amd64-base-debian:bookworm"
+  aarch64: "homeassistant/aarch64-base-debian:bookworm"
+  armv7: "homeassistant/armv7-base-debian:bookworm"
+
+# Labels applied to the built image (OCI spec)
+labels:
+  org.opencontainers.image.title: "Limen OS"
+  org.opencontainers.image.description: >
+    Voice-first, AI-native desktop shell for Home Assistant
+  org.opencontainers.image.source: "https://github.com/waldiez/limen-os"
+  org.opencontainers.image.licenses: "MIT"
+
+# Squash layers in final image to reduce size (requires Docker BuildKit)
+squash: false

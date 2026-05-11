@@ -1,0 +1,19 @@
+[Unit]
+Description=LIMEN OS window manager (openbox)
+After=limen-xvfb.service
+Requires=limen-xvfb.service
+
+[Service]
+Type=simple
+Environment=DISPLAY=:99
+Environment=HOME=/home/limen
+ExecStartPre=/usr/bin/xsetroot -solid "#1a1014"
+ExecStart=/usr/bin/openbox --config-file /dev/null
+Restart=on-failure
+RestartSec=2s
+
+User=limen
+Group=limen
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,343 @@
+/* Landing Page Styles */
+
+.landing-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle animated background */
+.landing-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse at 20% 80%,
+      rgba(120, 119, 198, 0.08) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 80% 20%,
+      rgba(255, 182, 185, 0.06) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 50% 50%,
+      rgba(76, 81, 109, 0.05) 0%,
+      transparent 70%
+    );
+  animation: ambientPulse 8s ease-in-out infinite;
+}
+
+@keyframes ambientPulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Calligraphy text container */
+.calligraphy-container {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding: 2rem;
+}
+
+.calligraphy-line {
+  font-family:
+    "Playfair Display", "Cormorant Garamond", "Times New Roman", serif;
+  font-size: clamp(1.8rem, 5vw, 3.5rem);
+  font-weight: 300;
+  letter-spacing: 0.15em;
+  color: transparent;
+  margin: 0.3em 0;
+  position: relative;
+  display: block;
+}
+
+.calligraphy-line.title {
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  margin-bottom: 0.5em;
+}
+
+.calligraphy-line.subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  font-weight: 300;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+/* Individual character styling */
+.char {
+  display: inline-block;
+  opacity: 0;
+  color: #f5f5f0;
+  text-shadow: 0 0 40px rgba(245, 245, 240, 0.3);
+  animation: charReveal 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+.char.space {
+  width: 0.3em;
+}
+
+@keyframes charReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) rotateX(-40deg);
+    filter: blur(4px);
+  }
+  60% {
+    opacity: 0.8;
+    transform: translateY(-3px) rotateX(5deg);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotateX(0);
+    filter: blur(0);
+  }
+}
+
+/* Decorative line */
+.decorative-line {
+  width: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(245, 245, 240, 0.6),
+    transparent
+  );
+  margin: 2rem auto;
+  transition: width 1.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.decorative-line.visible {
+  width: min(300px, 60vw);
+}
+
+/* Enter Portal Button */
+.enter-portal {
+  position: relative;
+  z-index: 10;
+  margin-top: 3rem;
+  opacity: 0;
+  transform: translateY(30px);
+  animation: portalReveal 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  animation-play-state: paused;
+}
+
+.enter-portal.visible {
+  animation-play-state: running;
+}
+
+@keyframes portalReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.portal-button {
+  position: relative;
+  padding: 1.2rem 3rem;
+  font-family: "Playfair Display", serif;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  font-weight: 400;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #f5f5f0;
+  background: transparent;
+  border: 1px solid rgba(245, 245, 240, 0.3);
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.portal-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(120, 119, 198, 0.2),
+    rgba(255, 182, 185, 0.1)
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.portal-button::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(
+    circle,
+    rgba(245, 245, 240, 0.15) 0%,
+    transparent 70%
+  );
+  transform: translate(-50%, -50%);
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.portal-button:hover {
+  border-color: rgba(245, 245, 240, 0.6);
+  box-shadow:
+    0 0 30px rgba(120, 119, 198, 0.2),
+    0 0 60px rgba(255, 182, 185, 0.1),
+    inset 0 0 20px rgba(245, 245, 240, 0.05);
+}
+
+.portal-button:hover::before {
+  opacity: 1;
+}
+
+.portal-button:hover::after {
+  width: 300%;
+  height: 300%;
+}
+
+.portal-button:active {
+  transform: scale(0.98);
+}
+
+.portal-button span {
+  position: relative;
+  z-index: 1;
+}
+
+/* Portal glow ring effect */
+.portal-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 120%;
+  height: 200%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.portal-button:hover .portal-glow {
+  opacity: 1;
+}
+
+.portal-glow::before,
+.portal-glow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(245, 245, 240, 0.1);
+  animation: portalRing 3s linear infinite;
+}
+
+.portal-glow::after {
+  animation-delay: -1.5s;
+}
+
+@keyframes portalRing {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* Skip hint */
+.skip-hint {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: "Inter", sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  color: rgba(245, 245, 240, 0.3);
+  opacity: 0;
+  animation: fadeIn 1s ease 2s forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+.skip-hint kbd {
+  display: inline-block;
+  padding: 0.2em 0.5em;
+  background: rgba(245, 245, 240, 0.1);
+  border-radius: 3px;
+  font-family: monospace;
+  margin: 0 0.2em;
+}
+
+/* Page transition */
+.landing-container.exiting {
+  animation: pageExit 1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+@keyframes pageExit {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.1);
+    filter: blur(10px);
+  }
+}
+
+/* Floating particles (optional decorative) */
+.particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: rgba(245, 245, 240, 0.3);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: float linear infinite;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) rotate(720deg);
+    opacity: 0;
+  }
+}

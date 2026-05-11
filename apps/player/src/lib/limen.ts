@@ -1,0 +1,146 @@
+/**
+ * limen — lightweight bridge between WaldiezPlayer and LIMEN OS relay.
+ *
+ * Works in any runtime:
+ *   - Tauri shell  → Tauri event API (window.__TAURI_INTERNALS__)
+ *   - Browser      → SSE from relay at LIMEN_RELAY_URL / localhost:1421
+ *
+ * Used by:
+ *   - App.tsx  — listen for player:mood, player:control events
+ *   - MoodPlayer / playlist — post track/mood changes as IPC Notify
+ */
+
+function resolveRelayUrl(): string | null {
+    if (typeof window === "undefined") return null;
+
+    const injected = (window as { __LIMEN_RELAY__?: string }).__LIMEN_RELAY__;
+    if (typeof injected === "string" && injected.trim()) return injected.trim();
+
+    const host = window.location.hostname;
+    if (host === "localhost" || host === "127.0.0.1" || host === "::1") {
+        return "http://localhost:1421";
+    }
+
+    return null;
+}
+
+const RELAY_URL = resolveRelayUrl();
+
+// ── IPC POST ──────────────────────────────────────────────────────────────────
+
+interface IpcRequest {
+    type: string;
+    [key: string]: unknown;
+}
+
+export async function postIpc(req: IpcRequest): Promise<void> {
+    if (!RELAY_URL) return;
+    try {
+        await fetch(`${RELAY_URL}/ipc`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(req),
+        });
+    } catch {
+        // Fire-and-forget; relay may be unavailable in pure browser mode.
+    }
+}
+
+// ── Convenience helpers ───────────────────────────────────────────────────────
+
+/** Emit a mood change so LIMEN can switch its scene to match. */
+export function postMoodChanged(mood: string): void {
+    void postIpc({ type: "Custom", name: "player:mood", payload: { mood } });
+}
+
+/** Emit a now-playing notification. */
+export function postNowPlaying(title: string, artist?: string): void {
+    void postIpc({
+        type: "Notify",
+        title: "Now playing",
+        body: artist ? `${title} — ${artist}` : title,
+        kind: "player:track",
+    });
+    void postIpc({ type: "Custom", name: "player:track", payload: { title, artist } });
+}
+
+// ── SSE event subscription ────────────────────────────────────────────────────
+
+type LimenEventHandler = (kind: string, payload: unknown) => void;
+
+let _sse: EventSource | null = null;
+const _handlers = new Set<LimenEventHandler>();
+
+function ensureSSE(): void {
+    if (!RELAY_URL || _sse) return;
+    try {
+        _sse = new EventSource(`${RELAY_URL}/events`);
+        _sse.onmessage = ev => {
+            try {
+                const event = JSON.parse(ev.data as string) as {
+                    kind?: { [key: string]: unknown } | string;
+                };
+                if (!event.kind) return;
+                // LimenEvent.kind is an enum; serde serialises it as { "Custom": { name, payload } }
+                const kindObj = event.kind;
+                if (typeof kindObj === "object") {
+                    const [name, data] = Object.entries(kindObj)[0] ?? [];
+                    if (name) _handlers.forEach(h => h(name, data));
+                } else {
+                    _handlers.forEach(h => h(kindObj, null));
+                }
+            } catch {
+                // ignore malformed frames
+            }
+        };
+        _sse.onerror = () => {
+            _sse?.close();
+            _sse = null;
+            // Reconnect after 5s.
+            setTimeout(ensureSSE, 5000);
+        };
+    } catch {
+        // SSE not available (e.g. jest).
+    }
+}
+
+/**
+ * Subscribe to LIMEN events. Returns an unsubscribe function.
+ * Automatically starts the SSE connection on first call.
+ */
+export function onLimenEvent(handler: LimenEventHandler): () => void {
+    if (!RELAY_URL) return () => {};
+    ensureSSE();
+    _handlers.add(handler);
+    return () => _handlers.delete(handler);
+}
+
+/**
+ * Subscribe only to player:control events.
+ * handler receives the command string (play|pause|next|prev|stop|volume_up|volume_down).
+ */
+export function onPlayerControl(handler: (command: string) => void): () => void {
+    return onLimenEvent((kind, data) => {
+        if (kind === "Custom") {
+            const d = data as { name?: string; payload?: { command?: string } };
+            if (d?.name === "player:control" && d.payload?.command) {
+                handler(d.payload.command);
+            }
+        }
+    });
+}
+
+/**
+ * Subscribe to player:mood events emitted by LIMEN intent recognition.
+ * (mood → scene → player paradigm, reverse direction)
+ */
+export function onSceneMood(handler: (mood: string) => void): () => void {
+    return onLimenEvent((kind, data) => {
+        if (kind === "Custom") {
+            const d = data as { name?: string; payload?: { mood?: string } };
+            if (d?.name === "player:mood" && d.payload?.mood) {
+                handler(d.payload.mood);
+            }
+        }
+    });
+}

@@ -1,0 +1,278 @@
+# LIMEN OS — Unified Docker Stack
+#
+# Single compose file for all environments (dev Mac, EC2, HAOS).
+# Use --profile flags to opt in to extra services.
+#
+# ── Profiles ──────────────────────────────────────────────────────────────────
+#   (none)       Core always-on: mosquitto, whisper, jupyterlab, studio,
+#                code-server, nodered
+#   ha           Home Assistant (Linux/HAOS — needs host networking)
+#   sinergym     Building energy simulation (linux/amd64, EnergyPlus)
+#   smartcities  Babylon.js 3D building twin (builds on sinergym image)
+#   agentflow    Workers / AgentFlow LLM agent system
+#   portainer    Docker management UI
+#   grafana      Metrics dashboards
+#
+# ── Quick start ───────────────────────────────────────────────────────────────
+#   Dev (core):       make dev-services-up
+#   Dev + sim:        make dev-sim-up
+#   Prod (EC2):       make stack-up
+#   Prod + Workers:   make stack-workers
+#   Everything:       docker compose -f docker/stack.yml \
+#                       --profile ha --profile sinergym --profile smartcities \
+#                       --profile agentflow up -d
+#
+# ── Key .env vars ─────────────────────────────────────────────────────────────
+#   BIND_HOST         0.0.0.0 (dev) or 127.0.0.1 (EC2 — behind nginx)
+#   LIMEN_DATA_DIR  Persistent data root   (prod: /opt/limen/data)
+#   LIMEN_WORKSPACE Workspace for code-server
+#   LIMEN_CODE      Path to limen/code/limen (sinergym + smartcities)
+#   SINERGYM_DIR      sinergym project dir   (default: $LIMEN_CODE/sinergym)
+
+x-data: &data ${LIMEN_DATA_DIR:-${HOME}/Projects/waldiez/limen/data}
+
+services:
+
+  # ── Mosquitto MQTT ──────────────────────────────────────────────────────────
+  # TCP 1883 for local services; WS 9001 for browser/Node-RED clients.
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: limen-mosquitto
+    restart: unless-stopped
+    ports:
+      - "${BIND_HOST:-0.0.0.0}:${MQTT_PORT:-1883}:1883"
+      - "${BIND_HOST:-0.0.0.0}:${MQTT_WS_PORT:-9001}:9001"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - limen-mqtt-data:/mosquitto/data
+      - limen-mqtt-log:/mosquitto/log
+
+  # ── Whisper STT ─────────────────────────────────────────────────────────────
+  # OpenAI-compatible transcription: POST /v1/audio/transcriptions
+  whisper:
+    image: fedirz/faster-whisper-server:latest-cpu
+    container_name: limen-whisper
+    restart: unless-stopped
+    ports:
+      - "${BIND_HOST:-0.0.0.0}:${WHISPER_PORT:-8083}:8000"
+    environment:
+      WHISPER__MODEL: "${WHISPER_MODEL:-tiny.en}"
+      WHISPER__INFERENCE_DEVICE: cpu
+      WHISPER__COMPUTE_TYPE: int8
+    volumes:
+      - limen-whisper-models:/root/.cache/huggingface
+
+  # ── JupyterLab (waldiez) ────────────────────────────────────────────────────
+  jupyterlab:
+    image: waldiez/jupyter
+    container_name: limen-jupyterlab
+    restart: unless-stopped
+    ports:
+      - "${BIND_HOST:-0.0.0.0}:${JUPYTER_PORT:-8888}:8888"
+    volumes:
+      - "${JUPYTER_NOTEBOOKS:-/opt/limen/data/notebooks}:/home/waldiez/notebooks"
+      - limen-jupyter-pip:/root/.cache/pip
+    environment:
+      JUPYTER_TOKEN: "${JUPYTER_TOKEN:-limen}"
+    entrypoint:
+      - bash
+      - -c
+      - |
+        exec jupyter lab \
+          --no-browser --ip="*" \
+          --ServerApp.terminado_settings="{'shell_command': ['/bin/bash']}" \
+          --IdentityProvider.token="${JUPYTER_TOKEN:-limen}" \
+          --IdentityProvider.hashed_password="" \
+          --IdentityProvider.password_required=False \
+          --ServerApp.allow_origin="*" \
+          --ServerApp.disable_check_xsrf=True \
+          --ZMQChannelsWebsocketConnection.iopub_data_rate_limit=2000000 \
+          --ZMQChannelsWebsocketConnection.rate_limit_window=2 \
+          --ServerApp.base_url=/jupyter/
+
+  # ── Waldiez Studio ──────────────────────────────────────────────────────────
+  studio:
+    image: waldiez/studio
+    container_name: limen-waldiez-studio
+    restart: unless-stopped
+    ports:
+      - "${BIND_HOST:-0.0.0.0}:${W_STUDIO_PORT:-8001}:8000"
+    volumes:
+      - "${W_STUDIO_WORKSPACE:-/opt/limen/data/studio-workspace}:/home/waldiez/workspace"
+    environment:
+      WALDIEZ_STUDIO_BASE_URL: /studio/
+
+  # ── VS Code Server ──────────────────────────────────────────────────────────
+  code-server:
+    image: codercom/code-server:latest
+    container_name: limen-code-server
+    restart: unless-stopped
+    user: root
+    entrypoint: ["/usr/bin/dumb-init", "--"]
+    command:
+      - /bin/sh
+      - -c
+      - |
+        code-server --install-extension /tmp/waldiez-vscode.vsix --force 2>/dev/null || true
+        exec code-server \
+          --bind-addr 0.0.0.0:8080 --auth none \
+          --disable-telemetry --disable-update-check \
+          /home/coder/workspace
+    ports:
+      - "${BIND_HOST:-0.0.0.0}:${CODE_SERVER_PORT:-8080}:8080"
+    volumes:
+      - "${LIMEN_WORKSPACE:-${HOME}/Projects}:/home/coder/workspace"
+      - "${CODE_SERVER_VSIX:-./code-server/waldiez-vscode-0.7.1.vsix}:/tmp/waldiez-vscode.vsix:ro"
+      - limen-code-config:/home/coder/.config
+    environment:
+      PASSWORD: ""
+      DEFAULT_WORKSPACE: /home/coder/workspace
+
+  # ── Node-RED ─────────────────────────────────────────────────────────────────
+  nodered:
+    image: nodered/node-red:latest
+    container_name: limen-nodered
+    restart: unless-stopped
+    ports:
+      - "${BIND_HOST:-0.0.0.0}:${NODERED_PORT:-1880}:1880"
+    volumes:
+      - limen-nodered-data:/data
+    environment:
+      NODE_RED_ENABLE_PROJECTS: "true"
+      NODE_RED_CREDENTIAL_SECRET: "${NODERED_SECRET:-limen}"
+    depends_on:
+      - mosquitto
+
+  # ── Home Assistant ──────────────────────────────────────────────────────────
+  # Linux/HAOS only — needs host networking for mDNS/Zeroconf.
+  # Opt-in: --profile ha
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant:stable
+    container_name: limen-homeassistant
+    restart: unless-stopped
+    privileged: true
+    network_mode: host
+    ports: []
+    entrypoint: ["/bin/bash", "/tmp/init-proxy.sh"]
+    volumes:
+      - ${LIMEN_DATA_DIR:-${HOME}/Projects/waldiez/limen/data}/ha-config:/config
+      - /etc/localtime:/etc/localtime:ro
+      - ./homeassistant/init-proxy.sh:/tmp/init-proxy.sh:ro
+    environment:
+      TZ: "${TZ:-Europe/Athens}"
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8123/manifest.json"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    profiles: [ha]
+
+  # ── Sinergym — Building Energy Simulation ───────────────────────────────────
+  # FastAPI + SSE dashboard. EnergyPlus + sinergym all baked into image.
+  # Populate vendor/sinergym/ first: make vendor  then rebuild: make dev-sim-up
+  # Opt-in: --profile sinergym
+  sinergym:
+    platform: linux/amd64
+    image: waldiez/sinergym
+    pull_policy: build
+    build:
+      context: ../services/sinergym
+      dockerfile: Dockerfile
+    container_name: limen-sinergym
+    restart: unless-stopped
+    ports:
+      - "${BIND_HOST:-0.0.0.0}:${SINERGYM_PORT:-8090}:8090"
+    environment:
+      BASE_PATH: /sinergym
+    profiles: [sinergym]
+
+  # ── Smart Cities — Babylon.js Building Digital Twin ─────────────────────────
+  # WebSocket + Babylon.js 3D visualization with simulation control panel.
+  # Populate vendor/demo/ and vendor/saf/ first: make vendor  then: make dev-sim-up
+  # Opt-in: --profile smartcities
+  smartcities:
+    platform: linux/amd64
+    image: waldiez/smartcities
+    pull_policy: build
+    build:
+      context: ../services/smartcities
+      dockerfile: Dockerfile
+    container_name: limen-smartcities
+    restart: unless-stopped
+    ports:
+      - "${BIND_HOST:-0.0.0.0}:${SMARTCITIES_PORT:-8091}:8091"
+    environment:
+      EPLUS_PATH: /usr/local/EnergyPlus-25-2-0
+      LD_LIBRARY_PATH: /usr/local/EnergyPlus-25-2-0
+      DEMO_PORT: "8091"
+    profiles: [smartcities]
+
+  # ── Workers / AgentFlow ──────────────────────────────────────────────────────
+  # LLM agent system — monitor WS at /af/, REST API at /af/api/.
+  # Opt-in: --profile agentflow
+  agentflow:
+    pull_policy: build
+    build:
+      context: ./tools/agentflow
+      dockerfile: ../agentflow.dockerfile
+    image: limen-agentflow:local
+    container_name: limen-agentflow
+    restart: unless-stopped
+    ports:
+      - "${BIND_HOST:-0.0.0.0}:${AF_PORT:-8889}:8889"
+      - "${BIND_HOST:-0.0.0.0}:${AF_API_PORT:-8890}:8890"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - path: ../.env
+        required: false
+    environment:
+      AGENTFLOW_BROKER: "mosquitto"
+      AF_WS_PORT: "8889"
+      AF_REST_PORT: "8890"
+      AF_MQTT_PORT: "${MQTT_PORT:-1883}"
+      AF_LLM: "${AF_LLM:-anthropic}"
+      API_KEY: "${AF_API_KEY:-}"
+    depends_on:
+      - mosquitto
+    profiles: [agentflow]
+
+  # ── Portainer CE ─────────────────────────────────────────────────────────────
+  # Docker management UI. Opt-in: --profile portainer
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: limen-portainer
+    restart: unless-stopped
+    ports:
+      - "${BIND_HOST:-0.0.0.0}:${PORTAINER_PORT:-9090}:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - limen-portainer-data:/data
+    profiles: [portainer]
+
+  # ── Grafana ───────────────────────────────────────────────────────────────────
+  # Dashboards for MQTT sensor data and system metrics. Opt-in: --profile grafana
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: limen-grafana
+    restart: unless-stopped
+    ports:
+      - "${BIND_HOST:-0.0.0.0}:${GRAFANA_PORT:-3000}:3000"
+    volumes:
+      - limen-grafana-data:/var/lib/grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_PASSWORD:-limen}"
+      GF_SERVER_ROOT_URL: "%(protocol)s://%(domain)s:%(http_port)s/grafana/"
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+    profiles: [grafana]
+
+volumes:
+  limen-mqtt-data:
+  limen-mqtt-log:
+  limen-whisper-models:
+  limen-jupyter-pip:
+  limen-code-config:
+  limen-nodered-data:
+  limen-portainer-data:
+  limen-grafana-data:

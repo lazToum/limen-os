@@ -1,0 +1,33 @@
+[Unit]
+Description=LIMEN OS Firefox kiosk
+After=limen-openbox.service limen-serve.service
+Requires=limen-xvfb.service limen-openbox.service
+
+[Service]
+Type=simple
+Environment=DISPLAY=:99
+Environment=HOME=/home/limen
+Environment=MOZ_WEBRENDER=0
+Environment=MOZ_ACCELERATED=0
+Environment=XDG_RUNTIME_DIR=/tmp/limen-runtime
+Environment=DBUS_SESSION_BUS_ADDRESS=/dev/null
+
+ExecStartPre=/bin/mkdir -p /tmp/limen-runtime
+ExecStartPre=/bin/sleep 2
+
+ExecStart=/usr/bin/firefox \
+    --kiosk \
+    --no-remote \
+    --new-instance \
+    --profile /tmp/firefox-kiosk \
+    http://localhost:1420
+
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=5s
+
+User=limen
+Group=limen
+
+[Install]
+WantedBy=multi-user.target

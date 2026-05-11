@@ -1,0 +1,39 @@
+# LIMEN OS — x11vnc (exposes Xvfb :99 on TCP :5900)
+#
+# Allows VNC clients and noVNC to connect to the virtual display.
+# Requires: limen-xvfb.service
+#
+# Install:
+#   apt install x11vnc
+#   cp limen-x11vnc.service /etc/systemd/system/
+#   systemctl daemon-reload
+#   systemctl enable --now limen-x11vnc
+
+[Unit]
+Description=LIMEN OS x11vnc (VNC → Xvfb :99)
+After=limen-xvfb.service
+Requires=limen-xvfb.service
+
+[Service]
+Type=simple
+Environment=HOME=/home/limen
+
+ExecStart=/usr/bin/x11vnc \
+    -display :99 \
+    -forever \
+    -shared \
+    -nopw \
+    -rfbport 5900 \
+    -noxdamage \
+    -noxrecord \
+    -noipv6
+
+Restart=on-failure
+RestartSec=3s
+TimeoutStopSec=5s
+
+User=limen
+Group=limen
+
+[Install]
+WantedBy=multi-user.target

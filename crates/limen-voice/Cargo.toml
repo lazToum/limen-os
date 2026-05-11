@@ -1,0 +1,39 @@
+[[bin]]
+name = "limen-voiced"
+path = "src/bin/voiced.rs"
+
+[package]
+name = "limen-voice"
+description = "LIMEN OS voice — Whisper ONNX STT, Kokoro/Piper TTS, wake-word detection"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[features]
+default = ["whisper"]
+whisper = []
+piper = []
+kokoro = []
+
+[dependencies]
+tokio.workspace = true
+serde.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+# Audio I/O
+hound.workspace = true
+cpal.workspace = true
+
+# HTTP client (Whisper API)
+reqwest = { workspace = true, features = ["multipart"] }
+serde_json.workspace = true
+
+# ONNX inference (Whisper)
+# ort = { version = "2", features = ["download-binaries"] }  # enable in Phase 2
+
+bytes.workspace = true
+futures.workspace = true

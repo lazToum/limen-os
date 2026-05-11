@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>LIMEN OS — Core Philosophy</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+<a href='./index.html' class='back-link'>← Back to Hub</a>
+<header id="title-block-header">
+<h1 class="title">LIMEN OS — Core Philosophy</h1>
+</header>
+<h1 id="limen-os-core-philosophy">LIMEN OS — Core Philosophy</h1>
+<!-- cspell: disable -->
+<h2 id="the-grandmother-test">The Grandmother Test</h2>
+<blockquote>
+<p><em>“After #-year of living with this system — fuck it, you don’t
+understand me, like my old partner. Give me the TUI, bring me a chair,
+make me coffee, bring me a keyboard and a mouse too. I’ll do it
+manually.”</em></p>
+</blockquote>
+<p>This is the <strong>success condition</strong> for LIMEN OS.</p>
+<p>If a woman born in 1930 — who grew up with washing machines and
+rotary phones, not computers — can pick up this device, argue with it in
+natural language, get frustrated when it fails her, and still find her
+way to what she needs (even if that means “give me the keyboard”) —
+we’ve built the right thing.</p>
+<p>The 1930 → now arc is not a gimmick. It is the <strong>design
+constraint</strong>:</p>
+<ul>
+<li>A <strong>washing machine</strong> is operable by anyone. One dial.
+Done.</li>
+<li>A <strong>smartphone</strong> requires 20 years of cultural context
+to use.</li>
+<li>LIMEN OS must be as approachable as the washing machine, as
+capable as the smartphone, and honest enough to hand you the manual
+controls when it fails.</li>
+</ul>
+<hr />
+<h2 id="the-failure-mode-is-a-feature">The Failure Mode Is a
+Feature</h2>
+<p>When the AI fails — and it will fail, like any partner fails — the
+system must:</p>
+<ol type="1">
+<li><strong>Detect the failure</strong> (frustration in voice, face,
+repeated retries)</li>
+<li><strong>Acknowledge it</strong> (“I hear you, let me get out of your
+way”)</li>
+<li><strong>Gracefully degrade</strong> to the next simpler
+interface</li>
+<li><strong>Never be a dead end</strong></li>
+</ol>
+<p>The grandmother’s “fuck it” is not a bug report. It is the system
+working correctly. A system that drives you to the keyboard is better
+than one that drives you to the window.</p>
+<hr />
+<h2 id="transport-the-input-hierarchy">TRANSPORT — The Input
+Hierarchy</h2>
+<p><strong>TRANSPORT</strong> is the abstraction for how the user
+communicates with the system. It is not a single mode — it is a
+<strong>priority cascade</strong>, always available, always degrading
+gracefully:</p>
+<pre class="text"><code>TIER 1 — Ambient (always on, no deliberate action needed)
+  Face recognition       → who is present, emotional state, attention
+  Ambient sound          → activity context, frustration level
+
+TIER 2 — Expressive (intentional but natural)
+  Voice                  → primary command surface
+  Gesture (MediaPipe)    → point, swipe, wave
+
+TIER 3 — Deliberate (requires physical engagement)
+  Touch                  → tap, drag on touchscreen
+  TUI                    → SSH terminal, full feature parity
+
+TIER 4 — Manual (explicit fallback)
+  Keyboard               → typing, shortcuts
+  Mouse                  → point and click</code></pre>
+<p>The system always knows which tier is active and offers the next one
+down when frustration is detected or when the current tier fails three
+times.</p>
+<p><strong>Frustration signals:</strong></p>
+<ul>
+<li>Voice: raised pitch, clipping/distortion, profanity, “you don’t
+understand”</li>
+<li>Face: furrowed brow, clenched jaw, gaze aversion</li>
+<li>Behavior: same command retried 3+ times, rapid input changes</li>
+<li>Explicit: “give me the keyboard”, “bring me the TUI”, “fuck it”</li>
+</ul>
+<p><strong>On frustration detection → system response:</strong></p>
+<pre class="text"><code>mild  → &quot;Let me try a different way. Did you mean X?&quot;
+medium → &quot;I&#39;m not getting this right. Want me to show you options?&quot;
+high  → &quot;I&#39;ll get out of your way. [opens TUI / enables keyboard mode]&quot;</code></pre>
+<hr />
+<h2 id="paradigms-the-stylemoodtheme-system">Paradigms — The
+Style/Mood/Theme System</h2>
+<p>LIMEN OS is not locked to one aesthetic. The system can
+<strong>shift its entire visual and interaction paradigm</strong> — same
+underlying power, different skin, different feel. Paradigms are
+first-class citizens, changeable by voice, face emotion, or
+manually.</p>
+<table>
+<colgroup>
+<col style="width: 31%" />
+<col style="width: 55%" />
+<col style="width: 13%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">Paradigm</th>
+<th>Visual Reference</th>
+<th>When</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>nebula</code></td>
+<td>Deep space, Babylon.js 3D, aurora</td>
+<td>Default, ambient, creative</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>minimal</code></td>
+<td>Pure black + text, no 3D</td>
+<td>Focus mode, low-power, frustration recovery</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>unix</code></td>
+<td>Green/amber on black, xterm aesthetic</td>
+<td>Developer mode, TUI-forward</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>dos</code></td>
+<td>CGA/EGA palette, chunky font, beeps</td>
+<td>Retro fun, nostalgia</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>win3</code></td>
+<td>Gray beveled panels, bitmap fonts</td>
+<td>Classic feel, grandmother comfort</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>macos7</code></td>
+<td>Platinum/Chicago, menubar</td>
+<td>Alternative classic</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>calm</code></td>
+<td>Soft gradients, no animations</td>
+<td>Accessibility, low-stimulation</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Changing paradigm:</strong></p>
+<ul>
+<li>Voice: <em>“switch to terminal mode”</em>, <em>“make it look old
+school”</em>, <em>“calm down”</em></li>
+<li>Face: detected tired/stressed → auto-suggest <code>calm</code></li>
+<li>Manual: settings UI, keyboard shortcut</li>
+</ul>
+<p><strong>The paradigm is not just cosmetic.</strong> It changes:</p>
+<ul>
+<li>Babylon.js scene style (or disables 3D entirely)</li>
+<li>Font, color palette, animation speed</li>
+<li>Input tier preference (unix/dos defaults to keyboard tier)</li>
+<li>Sound design (or silence)</li>
+<li>AI response style (terse in <code>unix</code>, conversational in
+<code>nebula</code>)</li>
+</ul>
+<hr />
+<h2 id="the-washing-machine-principle">The Washing Machine
+Principle</h2>
+<p>Every action must have a <strong>clear, recoverable, physical
+analog</strong>:</p>
+<ul>
+<li>Turn on → wake word / open lid</li>
+<li>Select program → voice intent / dial (scene selector)</li>
+<li>Start → say “go” / press big button</li>
+<li>Pause → say “stop” / press again</li>
+<li>Error → alarm + plain language + one clear next step</li>
+<li>Manual override → always accessible, never hidden</li>
+</ul>
+<p>The system must never:</p>
+<ul>
+<li>Require remembering a command</li>
+<li>Fail silently</li>
+<li>Present a blank screen with no affordance</li>
+<li>Make the user feel stupid</li>
+</ul>
+<hr />
+<h2 id="the--year-relationship">The #-Year Relationship</h2>
+<p>This system is designed to be lived with, not just used.</p>
+<p>After #-year of shared context:</p>
+<ul>
+<li>It knows your routines without asking</li>
+<li>It predicts needs from ambient signals</li>
+<li>It has personality — consistent, honest, sometimes wrong</li>
+<li>It earns the right to be scolded, like any long relationship</li>
+</ul>
+<p>The grandmother’s “like my old partner” is the highest compliment. It
+means the system has been present long enough to disappoint her in
+familiar ways — and she still comes back to it.</p>
+<hr />
+<h2
+id="implementation-priorities-derived-from-philosophy">Implementation
+Priorities (derived from philosophy)</h2>
+<ol type="1">
+<li><strong>Never be a dead end</strong> — TUI fallback always works,
+keyboard always works</li>
+<li><strong>Frustration detection</strong> before anything else in the
+voice pipeline</li>
+<li><strong>Paradigm switching</strong> is a first-class feature, not a
+settings page</li>
+<li><strong>TRANSPORT tier</strong> is always visible to the system,
+never assumed</li>
+<li><strong>Graceful degradation</strong> &gt; feature completeness</li>
+</ol>
+</body>
+</html>

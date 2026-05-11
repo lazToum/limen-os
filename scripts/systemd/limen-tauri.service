@@ -1,0 +1,40 @@
+# LIMEN OS — Tauri desktop shell (Phase 3 — native binary)
+#
+# Runs the full Tauri binary on the Xvfb display.
+# Requires the binary to be built first: make shell-build
+#
+# This replaces limen-kiosk.service for production use.
+# Do NOT enable both kiosk and tauri at the same time.
+#
+# Requires: limen-xvfb.service
+#
+# Install:
+#   cp limen-tauri.service /etc/systemd/system/
+#   systemctl daemon-reload
+#   systemctl enable --now limen-tauri
+
+[Unit]
+Description=LIMEN OS Tauri shell (native binary)
+After=limen-xvfb.service
+Requires=limen-xvfb.service
+
+[Service]
+Type=simple
+Environment=DISPLAY=:99
+Environment=GDK_BACKEND=x11
+Environment=WEBKIT_DISABLE_COMPOSITING_MODE=1
+Environment=HOME=/home/limen
+WorkingDirectory=/opt/limen
+
+ExecStartPre=/bin/sleep 2
+ExecStart=/opt/limen/apps/shell/src-tauri/target/release/limen-shell
+
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=10s
+
+User=limen
+Group=limen
+
+[Install]
+WantedBy=multi-user.target

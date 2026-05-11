@@ -1,0 +1,26 @@
+[Unit]
+Description=JupyterLab (LIMEN OS)
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=limen
+WorkingDirectory=/opt/limen
+Environment=HOME=/home/limen
+Environment=PATH=/home/limen/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/home/limen/.local/bin/jupyter lab \
+    --no-browser \
+    --ip=127.0.0.1 \
+    --port=8888 \
+    --base-url=/jupyter/ \
+    --notebook-dir=/opt/limen/notebooks \
+    --ServerApp.token='' \
+    --ServerApp.password='' \
+    --ServerApp.allow_origin='*' \
+    --ServerApp.disable_check_xsrf=True
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

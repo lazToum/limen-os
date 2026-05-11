@@ -1,0 +1,55 @@
+# LIMEN OS — Docker stack lifecycle service
+#
+# Starts/stops the Docker Compose stack (HA, Jupyter, VS Code, Studio, MQTT, etc.)
+# so that systemd dependency ordering works correctly.
+#
+# This is a oneshot service: it fires docker compose up -d on start,
+# docker compose down on stop, and is considered "active" once the command exits.
+#
+# Install (as root):
+#   cp /opt/limen/scripts/systemd/limen-stack.service /etc/systemd/system/
+#   systemctl daemon-reload && systemctl enable --now limen-stack
+
+[Unit]
+Description=LIMEN OS — Docker Compose stack
+Documentation=https://github.com/waldiez/limen-os
+After=network-online.target docker.service
+Wants=network-online.target docker.service
+# Ensure stack is up before limen-serve starts
+Before=limen-serve.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/limen
+
+EnvironmentFile=-/etc/limen/serve.env
+
+ExecStart=/usr/bin/docker compose \
+    -f /opt/limen/docker/stack.yml \
+    --env-file /opt/limen/.env \
+    --profile agentflow \
+    up -d --remove-orphans
+
+ExecStop=/usr/bin/docker compose \
+    -f /opt/limen/docker/stack.yml \
+    --profile agentflow \
+    down
+
+ExecReload=/usr/bin/docker compose \
+    -f /opt/limen/docker/stack.yml \
+    --env-file /opt/limen/.env \
+    --profile agentflow \
+    up -d --remove-orphans --pull always
+
+# Allow systemd to manage the process but not kill containers on stop
+# (ExecStop already runs compose down cleanly)
+KillMode=none
+
+User=root
+# limen user needs docker group; stack must run as root for Docker socket
+# You can change this if limen is in the docker group:
+# User=limen
+
+[Install]
+WantedBy=multi-user.target

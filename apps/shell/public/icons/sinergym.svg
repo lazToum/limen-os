@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="sg-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a1040"/>
+      <stop offset="100%" stop-color="#0d1a2e"/>
+    </linearGradient>
+    <linearGradient id="sg-bld" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7c6af7"/>
+      <stop offset="100%" stop-color="#4a3fbf"/>
+    </linearGradient>
+    <linearGradient id="sg-bolt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4fc3f7"/>
+      <stop offset="100%" stop-color="#00e5ff"/>
+    </linearGradient>
+    <filter id="sg-glow">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <style>
+      @keyframes sg-pulse {
+        0%,100% { opacity:.9; }
+        50%      { opacity:.4; }
+      }
+      @keyframes sg-rise {
+        0%   { transform: translateY(2px); opacity:.3; }
+        100% { transform: translateY(-2px); opacity:.9; }
+      }
+      .sg-bolt { animation: sg-pulse 1.8s ease-in-out infinite; }
+      .sg-wave1 { animation: sg-pulse 2.2s ease-in-out infinite 0s; }
+      .sg-wave2 { animation: sg-pulse 2.2s ease-in-out infinite .4s; }
+      .sg-wave3 { animation: sg-pulse 2.2s ease-in-out infinite .8s; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="64" height="64" rx="14" fill="url(#sg-bg)"/>
+
+  <!-- Ground line -->
+  <line x1="8" y1="50" x2="56" y2="50" stroke="#3a3a5a" stroke-width="1" stroke-linecap="round"/>
+
+  <!-- Building left (small) -->
+  <rect x="9" y="34" width="10" height="16" rx="1" fill="url(#sg-bld)" opacity=".55"/>
+  <rect x="11" y="37" width="2.5" height="3" rx=".5" fill="#4fc3f7" opacity=".6"/>
+  <rect x="15" y="37" width="2.5" height="3" rx=".5" fill="#4fc3f7" opacity=".6"/>
+  <rect x="11" y="43" width="2.5" height="3" rx=".5" fill="#4fc3f7" opacity=".4"/>
+  <rect x="15" y="43" width="2.5" height="3" rx=".5" fill="#4fc3f7" opacity=".4"/>
+
+  <!-- Building center (tall) -->
+  <rect x="22" y="22" width="14" height="28" rx="1.5" fill="url(#sg-bld)" opacity=".85"/>
+  <rect x="24" y="25" width="3" height="3.5" rx=".5" fill="#4fc3f7" opacity=".7"/>
+  <rect x="29" y="25" width="3" height="3.5" rx=".5" fill="#4fc3f7" opacity=".7"/>
+  <rect x="24" y="31" width="3" height="3.5" rx=".5" fill="#4fc3f7" opacity=".5"/>
+  <rect x="29" y="31" width="3" height="3.5" rx=".5" fill="#4fc3f7" opacity=".5"/>
+  <rect x="24" y="37" width="3" height="3.5" rx=".5" fill="#4fc3f7" opacity=".35"/>
+  <rect x="29" y="37" width="3" height="3.5" rx=".5" fill="#4fc3f7" opacity=".35"/>
+  <rect x="26.5" y="44" width="5" height="6" rx=".5" fill="#1a1040" opacity=".6"/>
+
+  <!-- Building right (medium) -->
+  <rect x="39" y="30" width="12" height="20" rx="1" fill="url(#sg-bld)" opacity=".6"/>
+  <rect x="41" y="33" width="2.5" height="3" rx=".5" fill="#4fc3f7" opacity=".6"/>
+  <rect x="46" y="33" width="2.5" height="3" rx=".5" fill="#4fc3f7" opacity=".6"/>
+  <rect x="41" y="39" width="2.5" height="3" rx=".5" fill="#4fc3f7" opacity=".4"/>
+  <rect x="46" y="39" width="2.5" height="3" rx=".5" fill="#4fc3f7" opacity=".4"/>
+
+  <!-- Lightning bolt (energy) — overlaid on center building -->
+  <path class="sg-bolt" filter="url(#sg-glow)"
+    d="M33 10 L29 21 L33 21 L29 32 L37 19 L33 19 Z"
+    fill="url(#sg-bolt)" stroke="#4fc3f7" stroke-width=".3"/>
+
+  <!-- Energy arc waves (right side) -->
+  <path class="sg-wave1" d="M47 12 Q52 16 47 20" stroke="#7c6af7" stroke-width="1.5" stroke-linecap="round" fill="none" opacity=".7"/>
+  <path class="sg-wave2" d="M49.5 9.5 Q57 15.5 49.5 21.5" stroke="#7c6af7" stroke-width="1.5" stroke-linecap="round" fill="none" opacity=".5"/>
+  <path class="sg-wave3" d="M52 7 Q62 15 52 23" stroke="#7c6af7" stroke-width="1.5" stroke-linecap="round" fill="none" opacity=".3"/>
+</svg>

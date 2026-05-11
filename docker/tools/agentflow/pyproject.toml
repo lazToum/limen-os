@@ -1,0 +1,120 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agentflow"
+dynamic = ["version"]
+description = "Actor-model multi-agent framework — spawn, coordinate and monitor AI agents at runtime"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.10"
+authors = [{ name = "AgentFlow Contributors" }]
+keywords = ["agents", "llm", "actor-model", "mqtt", "multi-agent", "orchestration"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+]
+
+# Core runtime — always required
+dependencies = [
+    "aiomqtt>=1.0.0",
+    "aiohttp>=3.9.0",
+    "psutil>=5.9.0",
+    "python-dotenv>=1.0.0",
+    "websockets>=12.0",
+]
+
+[project.optional-dependencies]
+anthropic = ["anthropic>=0.25.0"]
+openai    = ["openai>=1.0.0"]
+discord   = ["discord.py>=2.3.0"]
+whatsapp  = ["twilio>=8.0.0"]
+ml        = ["ultralytics>=8.0.0", "torch>=2.0.0", "numpy>=1.24.0"]
+docs      = [
+    "markdown>=3.5",
+    "pygments>=2.17",
+    "watchdog>=5.0.0",
+]
+# Note: docs extras are only needed to *rebuild* site/ (run build_docs.py).
+# The pre-built site/ is committed to the repo and bundled into the wheel as-is.
+dev       = [
+    "agentflow[docs]",
+    "pre-commit>=3.0.0",
+    "coverage>=7.0.0",
+    "twine>=5.0.0",
+    "watchdog>=5.0.0",
+]
+
+# Everything except ML (heavy torch dep) — suitable for `pip install agentflow[all]`
+all = [
+    "agentflow[anthropic]",
+    "agentflow[openai]",
+    "agentflow[discord]",
+    "agentflow[whatsapp]",
+]
+
+[project.scripts]
+agentflow         = "agentflow.cli:main"
+agentflow-monitor = "agentflow.monitor_server:cli_main"
+
+[project.urls]
+Homepage      = "https://waldiez.github.io/agentflow/"
+Repository    = "https://github.com/waldiez/agentflow"
+Documentation = "https://waldiez.github.io/agentflow/guide/"
+"Bug Tracker" = "https://github.com/waldiez/agentflow/issues"
+
+# ── Version ────────────────────────────────────────────────────────────────────
+[tool.hatch.version]
+path = "agentflow/_version.py"
+
+# ── Build hook — auto-builds frontend if dist is stale ────────────────────────
+[tool.hatch.build.hooks.custom]
+path = "scripts/hooks/build_hook.py"
+
+# ── Wheel ──────────────────────────────────────────────────────────────────────
+[tool.hatch.build.targets.wheel]
+packages = ["agentflow", "agentflow.*"]
+exclude = [
+    "rust",
+    "node_modules",
+    "persist",
+    "__pycache__",
+    "*.log",
+    ".env*",
+    "frontend/src",
+    "frontend/node_modules",
+]
+
+# Bundle the pre-built static assets inside the package.
+# static/app/  → frontend SPA (Vite build output)
+# static/docs/ → documentation site (build_docs.py output)
+# After `pip install` these land at {site-packages}/agentflow/static/.
+[tool.hatch.build.targets.wheel.force-include]
+"static"       = "agentflow/static"
+"monitor.html" = "agentflow/monitor.html"
+
+# ── sdist (source distribution for PyPI) ──────────────────────────────────────
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "rust",
+    "node_modules",
+    "persist",
+    "__pycache__",
+    "*.log",
+    ".env*",
+    "frontend/node_modules",
+    ".git",
+]

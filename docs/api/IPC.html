@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>LIMEN OS — Daemon IPC</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+<a href='../index.html' class='back-link'>← Back to Hub</a>
+<header id="title-block-header">
+<h1 class="title">LIMEN OS — Daemon IPC</h1>
+</header>
+<h1 id="limen-os-daemon-ipc">LIMEN OS — Daemon IPC</h1>
+<p><code>limen-core</code> runs as a system-level daemon,
+communicating with the frontend and plugins via a Unix Domain Socket
+(UDS).</p>
+<hr />
+<h2 id="socket-path">Socket Path</h2>
+<p>The default path for the IPC socket is:</p>
+<pre class="text"><code>/run/limen/core.sock</code></pre>
+<hr />
+<h2 id="communication-protocol">Communication Protocol</h2>
+<ul>
+<li><strong>Transport</strong>: Unix Domain Socket (Stream)</li>
+<li><strong>Format</strong>: JSON-RPC-like newline-delimited JSON.</li>
+</ul>
+<hr />
+<h2 id="commands">Commands</h2>
+<h3 id="voice_command"><code>voice_command</code></h3>
+<p>Passes raw transcript for processing. - <strong>Request</strong>:
+<code>{"command": "voice_command", "transcript": "..."}</code> -
+<strong>Response</strong>:
+<code>{"status": "ok", "intent": {...}}</code></p>
+<h3 id="set_scene"><code>set_scene</code></h3>
+<p>Directly triggers a scene transition on the frontend. -
+<strong>Request</strong>:
+<code>{"command": "set_scene", "target": "..."}</code> -
+<strong>Response</strong>: <code>{"status": "ok"}</code></p>
+<h3 id="launch_app"><code>launch_app</code></h3>
+<p>Requests <code>limen-core</code> to execute a system command or
+plugin. - <strong>Request</strong>:
+<code>{"command": "launch_app", "name": "..."}</code> -
+<strong>Response</strong>:
+<code>{"status": "ok", "pid": 1234}</code></p>
+<h3 id="ai_query"><code>ai_query</code></h3>
+<p>Queries the LLM router directly. - <strong>Request</strong>:
+<code>{"command": "ai_query", "query": "..."}</code> -
+<strong>Response</strong>:
+<code>{"status": "ok", "response": "..."}</code></p>
+<hr />
+<h2 id="error-codes">Error Codes</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>UNAUTHORIZED</code></td>
+<td>Plugin requested action without permission.</td>
+</tr>
+<tr>
+<td><code>NOT_FOUND</code></td>
+<td>Target app or scene does not exist.</td>
+</tr>
+<tr>
+<td><code>DAEMON_BUSY</code></td>
+<td>Daemon is currently processing a long-running request.</td>
+</tr>
+<tr>
+<td><code>INVALID_JSON</code></td>
+<td>Malformed command sent to the socket.</td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>

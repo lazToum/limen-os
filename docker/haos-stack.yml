@@ -1,0 +1,178 @@
+# LIMEN OS — HAOS Stack
+#
+# All services that make sense to run alongside Home Assistant OS.
+# Pick and choose — every service is independent; comment out what you don't need.
+#
+# Usage (on the host with Docker):
+#   docker compose -f docker/haos-stack.yml up -d
+#   docker compose -f docker/haos-stack.yml down
+#   docker compose -f docker/haos-stack.yml logs -f <service>
+#
+# Or via Make:
+#   make haos-stack-up
+#   make haos-stack-down
+#
+# Copy .env.example → .env and fill in the blanks.
+# All passwords default to "limen" — change them before exposing externally.
+#
+# Ports summary:
+#   1420   LIMEN OS shell (SPA)
+#   1883   Mosquitto MQTT (TCP)
+#   8080   VS Code Server
+#   8888   JupyterLab
+#   8766   synapsd companion WebSocket   (run separately via systemd)
+#   9001   Mosquitto MQTT over WebSocket
+#   9090   Portainer CE (Docker management)
+
+services:
+
+  # ── LIMEN OS SPA ──────────────────────────────────────────────────────────
+  # Serves the built frontend. Run `make server-build` first.
+  # Skip if you use systemd + limen-static.service instead.
+  limen-shell:
+    image: oven/bun:1
+    container_name: limen-shell
+    restart: unless-stopped
+    working_dir: /app
+    command: bun /app/scripts/serve.ts
+    ports:
+      - "${SHELL_PORT:-1420}:1420"
+    volumes:
+      - ${LIMEN_ROOT:-.}:/app:ro
+    environment:
+      LIMEN_DIST: /app/apps/shell/dist
+      PORT: "1420"
+      HOST: "0.0.0.0"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:1420"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    profiles: [shell]   # opt-in: docker compose --profile shell up -d
+
+  # ── Mosquitto MQTT ──────────────────────────────────────────────────────────
+  # Comment out if you already have one running (check: docker ps | grep mosquitto)
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: limen-mosquitto
+    restart: unless-stopped
+    ports:
+      - "${MQTT_PORT:-1883}:1883"
+      - "${MQTT_WS_PORT:-9001}:9001"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - limen-mqtt-data:/mosquitto/data
+      - limen-mqtt-log:/mosquitto/log
+    profiles: [mqtt]    # opt-in — skip if agentflow-mosquitto is already running
+
+  # ── VS Code Server ──────────────────────────────────────────────────────────
+  code-server:
+    image: codercom/code-server:latest
+    container_name: limen-code-server
+    restart: unless-stopped
+    ports:
+      - "${CODE_SERVER_PORT:-8080}:8080"
+    volumes:
+      # Project files — adjust to your workspace root
+      - "${LIMEN_WORKSPACE:-${HOME}/Projects}:/home/coder/workspace"
+      # Named volume — run as root so the image can write config freely.
+      - limen-code-config:/home/coder/.config
+    environment:
+      PASSWORD: "${CODE_SERVER_PASSWORD:-limen}"
+      DEFAULT_WORKSPACE: /home/coder/workspace
+    user: root
+    # Bypass fixuid (entrypoint.sh runs fixuid which fails as root).
+    # dumb-init is the real process supervisor; code-server is the app.
+    entrypoint: ["/usr/bin/dumb-init", "--"]
+    command: ["/usr/bin/code-server", "--bind-addr", "0.0.0.0:8080", "/home/coder/workspace"]
+    labels:
+      limen.app: "code-server"
+      limen.url: "http://localhost:${CODE_SERVER_PORT:-8080}"
+
+  # ── JupyterLab (waldiez) ────────────────────────────────────────────────────
+  # Installs waldiez[jupyter,studio] on first boot (cached in pip-cache volume)
+  # then spawns jupyter lab. No pre-built image quirks.
+  jupyterlab:
+    image: python:3.12-slim
+    container_name: limen-jupyterlab
+    restart: unless-stopped
+    ports:
+      - "${JUPYTER_PORT:-8888}:8888"
+    volumes:
+      - "${JUPYTER_NOTEBOOKS:-${HOME}/Projects/waldiez/jupyter}:/notebooks"
+      - limen-jupyter-pip:/root/.cache/pip   # keeps installs fast after first run
+    environment:
+      JUPYTER_TOKEN: "${JUPYTER_TOKEN:-limen}"
+    command: >-
+      bash -c "pip install -q 'waldiez[jupyter,studio]' &&
+               jupyter lab
+                 --ip=0.0.0.0
+                 --port=8888
+                 --no-browser
+                 --notebook-dir=/notebooks
+                 --ServerApp.token=$${JUPYTER_TOKEN}
+                 --ServerApp.allow_origin='*'
+                 --ServerApp.disable_check_xsrf=True"
+
+  # ── Portainer CE ────────────────────────────────────────────────────────────
+  # Manage all Docker containers from within the LIMEN OS shell.
+  # Open via the browser app pointing to http://localhost:9090
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: limen-portainer
+    restart: unless-stopped
+    ports:
+      - "${PORTAINER_PORT:-9090}:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - limen-portainer-data:/data
+    profiles: [portainer]   # opt-in
+
+  # ── Grafana ─────────────────────────────────────────────────────────────────
+  # Dashboards for MQTT sensor data, AgentFlow events, system metrics.
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: limen-grafana
+    restart: unless-stopped
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    volumes:
+      - limen-grafana-data:/var/lib/grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_PASSWORD:-limen}"
+      GF_SERVER_ROOT_URL: "%(protocol)s://%(domain)s:%(http_port)s/grafana/"
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+    profiles: [grafana]   # opt-in
+
+  # ── Node-RED ────────────────────────────────────────────────────────────────
+  # Visual flow editor — bridges MQTT ↔ HA ↔ LIMEN OS events.
+  nodered:
+    image: nodered/node-red:latest
+    container_name: limen-nodered
+    restart: unless-stopped
+    ports:
+      - "${NODERED_PORT:-1880}:1880"
+    volumes:
+      - limen-nodered-data:/data
+    environment:
+      NODE_RED_CREDENTIAL_SECRET: "${NODERED_SECRET:-limen}"
+    profiles: [nodered]   # opt-in
+
+volumes:
+  limen-mqtt-data:
+  limen-mqtt-log:
+  limen-code-config:
+  limen-jupyter-pip:
+  limen-portainer-data:
+  limen-grafana-data:
+  limen-nodered-data:
+
+# ── Mosquitto config (mounted above) ─────────────────────────────────────────
+# Create docker/mosquitto/mosquitto.conf with:
+#
+#   listener 1883
+#   listener 9001
+#   protocol websockets
+#   allow_anonymous true
+#
+# Or set allow_anonymous false and add a password file for production.

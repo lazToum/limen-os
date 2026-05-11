@@ -1,0 +1,110 @@
+<svg
+  class="ammelie-icon"
+  viewBox="0 0 100 100"
+  width="48"
+  height="48"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  aria-label="Ammelie"
+  role="img"
+>
+  <style>
+    /*
+     * Ammelie icon — self-contained, embeddable SVG
+     * Brand: interlocking teal + amber C-arcs (yin-yang mark)
+     * No global selectors. Scoped to svg.ammelie-icon.
+     */
+
+    svg.ammelie-icon {
+      overflow: visible;
+      filter: drop-shadow(0 2px 6px rgba(41, 196, 216, 0.18))
+              drop-shadow(0 2px 6px rgba(245, 193, 39, 0.18));
+      animation: am-breathe 3.2s ease-in-out infinite;
+    }
+
+    /* Amber arc rotates clockwise, teal counter-clockwise — slow yin-yang drift */
+    svg.ammelie-icon .am-amber {
+      transform-origin: 50px 50px;
+      animation: am-cw 22s linear infinite;
+    }
+    svg.ammelie-icon .am-teal {
+      transform-origin: 50px 50px;
+      animation: am-ccw 22s linear infinite;
+    }
+    svg.ammelie-icon .am-dot-amber {
+      transform-origin: 50px 50px;
+      animation: am-cw 22s linear infinite;
+    }
+    svg.ammelie-icon .am-dot-teal {
+      transform-origin: 50px 50px;
+      animation: am-ccw 22s linear infinite;
+    }
+
+    @keyframes am-breathe {
+      0%, 100% { filter:
+        drop-shadow(0 2px 6px rgba(41,196,216,0.18))
+        drop-shadow(0 2px 6px rgba(245,193,39,0.18));
+      }
+      50% { filter:
+        drop-shadow(0 3px 10px rgba(41,196,216,0.40))
+        drop-shadow(0 3px 10px rgba(245,193,39,0.40));
+      }
+    }
+    @keyframes am-cw  { from { transform: rotate(0deg);    } to { transform: rotate(360deg);  } }
+    @keyframes am-ccw { from { transform: rotate(0deg);    } to { transform: rotate(-360deg); } }
+
+    @media (prefers-reduced-motion: reduce) {
+      svg.ammelie-icon,
+      svg.ammelie-icon .am-amber,
+      svg.ammelie-icon .am-teal,
+      svg.ammelie-icon .am-dot-amber,
+      svg.ammelie-icon .am-dot-teal { animation: none; }
+    }
+  </style>
+
+  <!--
+    Geometry: center (50,50), outer r=44, inner r=28
+    Amber arc: 270° sweep, gap at lower-left (135°→225°)
+      Outer: start 225° (18.9,18.9) → CW to 135° (18.9,81.1)
+      Inner: start 135° (30.2,69.8) → CCW to 225° (30.2,30.2)
+    Teal arc: 270° sweep, gap at upper-right (315°→45°)
+      Outer: start 45° (81.1,81.1) → CW to 315° (81.1,18.9)
+      Inner: start 315° (69.8,30.2) → CCW to 45° (69.8,69.8)
+    Amber dot: mid-radius 36 at 315° → (75.5, 24.5)
+    Teal dot:  mid-radius 36 at 135° → (24.5, 75.5)
+  -->
+
+  <!-- Amber arc (teal on top, so amber drawn first) -->
+  <g class="am-amber">
+    <path
+      d="M 18.9 18.9
+         A 44 44 0 1 1 18.9 81.1
+         L 30.2 69.8
+         A 28 28 0 1 0 30.2 30.2
+         Z"
+      fill="#F5C127"
+    />
+  </g>
+
+  <!-- Teal arc -->
+  <g class="am-teal">
+    <path
+      d="M 81.1 81.1
+         A 44 44 0 1 1 81.1 18.9
+         L 69.8 30.2
+         A 28 28 0 1 0 69.8 69.8
+         Z"
+      fill="#29C4D8"
+    />
+  </g>
+
+  <!-- Amber dot (upper-right, inside teal gap) -->
+  <g class="am-dot-amber">
+    <circle cx="75.5" cy="24.5" r="9.5" fill="#F5C127"/>
+  </g>
+
+  <!-- Teal dot (lower-left, inside amber gap) -->
+  <g class="am-dot-teal">
+    <circle cx="24.5" cy="75.5" r="9.5" fill="#29C4D8"/>
+  </g>
+</svg>

@@ -1,0 +1,35 @@
+{
+  "name": "@limen-os/smart-cities-client",
+  "version": "0.1.0",
+  "description": "LIMEN OS client for smart city sensor data — SPARQL queries and live MQTT subscriptions",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types":   "./dist/index.d.ts",
+      "import":  "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build":   "tsup",
+    "dev":     "tsup --watch",
+    "check":   "tsc --noEmit",
+    "test":    "vitest run"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "mqtt":         "^5.15.0",
+    "tsup":         "^8.5.1",
+    "typescript":   "^5.9.3",
+    "vitest":       "^3.2.4"
+  },
+  "peerDependencies": {
+    "react": "^19.2.4"
+  },
+  "peerDependenciesMeta": {
+    "react": { "optional": true }
+  }
+}

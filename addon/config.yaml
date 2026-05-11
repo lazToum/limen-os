@@ -1,0 +1,68 @@
+# LIMEN OS — Home Assistant Add-on Manifest
+# https://developers.home-assistant.io/docs/add-ons/configuration
+---
+name: Limen OS
+description: >
+  Voice-first, AI-native desktop shell for Home Assistant.
+  Runs a Babylon.js/React shell (Tauri-style), a Ratatui TUI (ttyd),
+  and a Chromium kiosk — all in one add-on container.
+version: "0.1.0"
+slug: limen_os
+url: https://github.com/waldiez/limen-os
+
+# ── Architecture support ──────────────────────────────────────────────────────
+arch:
+  - amd64
+  - aarch64
+  - armv7
+
+# ── Startup behaviour ─────────────────────────────────────────────────────────
+startup: application
+boot: auto
+
+# ── Ports ─────────────────────────────────────────────────────────────────────
+# 1420  — serve.ts SPA + reverse proxy (primary ingress target)
+# 6080  — noVNC (browser-accessible VNC → Chromium kiosk on :99)
+# 7681  — ttyd (web terminal wrapping limen-tui)
+ports:
+  1420/tcp: 1420
+  6080/tcp: 6080
+  7681/tcp: 7681
+
+ports_description:
+  1420/tcp: Limen OS SPA + API server
+  6080/tcp: noVNC — Chromium kiosk viewer
+  7681/tcp: TUI web terminal (ttyd / limen-tui)
+
+# ── Ingress (HA sidebar proxy) ────────────────────────────────────────────────
+ingress: true
+ingress_port: 1420
+ingress_stream: false
+panel_icon: mdi:monitor-dashboard
+panel_title: Limen OS
+
+# ── Filesystem mappings ───────────────────────────────────────────────────────
+# /config → /homeassistant on newer HA versions, mapped r/w so we can keep
+#            persistent state under /config/limen/
+# /ssl    → TLS certs (read-only — we read them; certbot manages them)
+# /share  → shared volume for assets, plugins, models
+map:
+  - config:rw
+  - ssl:r
+  - share:rw
+
+# ── Networking ────────────────────────────────────────────────────────────────
+host_network: false
+
+# ── Security ─────────────────────────────────────────────────────────────────
+privileged: false
+
+# Allow /dev/dri (GPU) passthrough for WebGL/Babylon.js inside Chromium
+devices:
+  - /dev/dri
+
+# ── Add-on options (exposed in HA UI) ────────────────────────────────────────
+# Empty for now — all config lives in /config/limen/serve.env
+# Populate schema when add-on options are added.
+options: {}
+schema: {}

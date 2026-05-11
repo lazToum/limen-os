@@ -1,0 +1,51 @@
+{
+  "name": "@limen-os/shell",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "check": "tsc --noEmit && eslint src --max-warnings 0",
+    "lint": "eslint src --fix",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@babylonjs/core": "^8.54.2",
+    "@babylonjs/gui": "^8.54.2",
+    "@babylonjs/inspector": "^8.54.2",
+    "@babylonjs/loaders": "^8.54.2",
+    "@babylonjs/materials": "^8.54.2",
+    "@babylonjs/post-processes": "^8.54.2",
+    "@limen-os/ai-client": "workspace:*",
+    "@limen-os/ui": "workspace:*",
+    "@limen-os/voice-client": "workspace:*",
+    "@tauri-apps/api": "^2.10.1",
+    "@tauri-apps/plugin-shell": "^2.3.5",
+    "@waldiez/react": "^0.7.1",
+    "@waldiez/wid": "git+https://github.com/waldiez/wid.git",
+    "framer-motion": "^12.35.2",
+    "immer": "^11.1.4",
+    "jotai": "^2.18.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "zustand": "^5.0.11"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@tailwindcss/vite": "^4.2.1",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@typescript-eslint/eslint-plugin": "^8.57.0",
+    "@typescript-eslint/parser": "^8.57.0",
+    "@vitejs/plugin-react": "^5.1.4",
+    "eslint": "^10.0.3",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "globals": "^17.4.0",
+    "tailwindcss": "^4.2.1",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vitest": "^4.0.18"
+  }
+}

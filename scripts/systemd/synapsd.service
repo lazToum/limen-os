@@ -1,0 +1,28 @@
+[Unit]
+Description=LIMEN OS Core Daemon (IPC, session, AgentFlow bridge)
+Documentation=https://github.com/waldiez/limen-os
+# Mosquitto runs in Docker — just wait for network, not mosquitto.service
+After=network.target docker.service
+Wants=docker.service
+
+[Service]
+Type=simple
+User=limen
+
+ExecStart=/usr/local/bin/synapsd
+
+Restart=on-failure
+RestartSec=3s
+
+EnvironmentFile=-/etc/limen/core.env
+EnvironmentFile=-%h/.config/limen/core.env
+
+Environment=LIMEN_LOG=limen_core=info
+
+RuntimeDirectory=limen
+RuntimeDirectoryMode=0755
+
+MemoryMax=256M
+
+[Install]
+WantedBy=default.target

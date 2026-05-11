@@ -1,0 +1,11 @@
+# SAF (Limen Agent Framework) runtime dependencies
+# saf itself is mounted at /limen/packages/agents/implementations/python/
+# sinergym + EnergyPlus are already installed in the base waldiez/sinergym image
+fastapi>=0.135.1
+uvicorn>=0.42.0
+websockets>=16.0
+aiofiles>=25.1.0
+aiomqtt>=2.5.0
+aiosqlite>=0.22.1
+redis>=7.1.1
+typing-extensions>=4.15.0

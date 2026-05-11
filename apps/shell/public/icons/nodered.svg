@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
+  <rect width="60" height="60" rx="8" fill="#8F0000"/>
+  <path d="M43 12H17c-2.8 0-5 2.2-5 5v6c0 2.8 2.2 5 5 5h26c2.8 0 5-2.2 5-5v-6c0-2.8-2.2-5-5-5z" fill="#fff" opacity="0.15"/>
+  <circle cx="14" cy="20" r="4" fill="#fff"/>
+  <circle cx="46" cy="20" r="4" fill="#CE0000"/>
+  <path d="M43 32H17c-2.8 0-5 2.2-5 5v6c0 2.8 2.2 5 5 5h26c2.8 0 5-2.2 5-5v-6c0-2.8-2.2-5-5-5z" fill="#fff" opacity="0.15"/>
+  <circle cx="14" cy="40" r="4" fill="#fff"/>
+  <circle cx="46" cy="40" r="4" fill="#CE0000"/>
+  <text x="30" y="24" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="8" font-weight="bold" fill="#fff">Node</text>
+  <text x="30" y="44" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="8" font-weight="bold" fill="#fff">RED</text>
+</svg>

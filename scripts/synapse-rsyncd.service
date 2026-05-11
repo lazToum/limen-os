@@ -1,0 +1,31 @@
+# LIMEN OS — rsync daemon systemd unit
+#
+# Install:
+#   cp limen-rsyncd.service /etc/systemd/system/
+#   systemctl daemon-reload
+#   systemctl enable --now limen-rsyncd
+#
+# Then from another host:
+#   rsync -avz rsync://limen-host:8730/source/   ./limen-os/
+#   rsync -avz rsync://limen-host:8730/preview/  ./dist/
+
+[Unit]
+Description=LIMEN OS rsync daemon
+Documentation=file:///opt/limen/scripts/rsyncd.conf
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/rsync \
+    --daemon \
+    --no-detach \
+    --config=/opt/limen/scripts/rsyncd.conf
+Restart=on-failure
+RestartSec=5s
+
+# Run as root inside the dev container (change for production).
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

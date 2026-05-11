@@ -1,0 +1,119 @@
+# LIMEN OS — pre-commit hooks
+# "safe to commit/push" — catches obvious issues, not a full CI run.
+#
+# Install:  pip install pre-commit && pre-commit install
+# Run once: pre-commit run --all-files
+#
+# Formatters (cargo fmt, ruff-format, dart format) auto-fix in place.
+# If they change files, git will show the diff — just `git add` and re-commit.
+
+default_install_hook_types: [pre-commit]
+default_stages: [pre-commit]
+
+# Never touch generated/vendored files
+exclude: |
+  (?x)^(
+    .*third_party/.*|
+    .*node_modules/.*|
+    .*\.bun/.*|
+    .*\.mypy_cache/.*|
+    apps/shell/dist/.*|
+    apps/player/.*dist/.*|
+    docker/tools/agentflow/static/app/assets/.*|
+    docker/tools/agentflow/infra/.*
+  )$
+
+repos:
+  # ── Universal sanity checks ────────────────────────────────────────────────
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: '\.md$'           # markdown trailing spaces can be intentional
+      - id: end-of-file-fixer
+        exclude: '\.svg$'
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: [--maxkb=1024]       # flag files > 1 MB
+      - id: check-json
+        exclude: 'tsconfig.*\.json$'   # tsconfig allows comments (handled by tsc)
+      - id: check-toml
+      - id: check-yaml
+        args: [--unsafe]           # some k8s/docker-compose yamls use custom tags
+      - id: detect-private-key
+
+  # ── Shell scripts ──────────────────────────────────────────────────────────
+  # Requires shellcheck on PATH: brew install shellcheck / apt install shellcheck
+  - repo: local
+    hooks:
+      - id: shellcheck
+        name: shellcheck
+        language: system
+        entry: shellcheck
+        # SC1091 = sourced file not found, SC2034 = unused var, SC3037 = echo flags (POSIX pedantry)
+        args: ["--severity=warning", "--exclude=SC1091,SC2034,SC3037"]
+        files: ^scripts/.*\.sh$
+
+  # ── Python (agentflow) ────────────────────────────────────────────────────
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.10
+    hooks:
+      - id: ruff
+        # E9 = runtime errors (SyntaxError), F = pyflakes (undefined names, unused imports)
+        # Not enforcing style (E1-E7, W, C) — too noisy for a safety-only gate
+        args: ["--select=E9,F", --fix]
+        files: ^docker/tools/agentflow/.*\.py$
+      - id: ruff-format          # auto-formats in place
+        files: ^docker/tools/agentflow/.*\.py$
+
+  # ── TypeScript / JavaScript ────────────────────────────────────────────────
+  # `bun run check` runs tsc --noEmit + eslint (includes prettier via eslint-config-prettier)
+  - repo: local
+    hooks:
+      - id: ts-check
+        name: TypeScript + ESLint (bun)
+        language: system
+        entry: bun run check
+        pass_filenames: false
+        files: '\.(ts|tsx)$'
+        types_or: [ts, tsx]
+
+  # ── Rust ───────────────────────────────────────────────────────────────────
+  - repo: local
+    hooks:
+      - id: cargo-fmt
+        name: cargo fmt (auto-fix)
+        language: system
+        entry: cargo fmt --all
+        pass_filenames: false
+        files: '\.rs$'
+        types: [rust]
+
+      - id: cargo-clippy
+        name: cargo clippy
+        language: system
+        # Warn on clippy issues but don't block commit (-D warnings to harden later)
+        entry: cargo clippy --all --quiet
+        pass_filenames: false
+        files: '\.rs$'
+        types: [rust]
+
+  # ── Flutter / Dart ────────────────────────────────────────────────────────
+  - repo: local
+    hooks:
+      - id: flutter-format
+        name: dart format (auto-fix)
+        language: system
+        entry: dart format
+        pass_filenames: true
+        files: ^apps/mobile/.*\.dart$
+        types: [file]
+
+      - id: flutter-analyze
+        name: flutter analyze
+        language: system
+        entry: bash -c 'cd apps/mobile && flutter analyze --no-pub'
+        pass_filenames: false
+        files: ^apps/mobile/

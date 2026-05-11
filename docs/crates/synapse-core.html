@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>LIMEN-CORE — The System Heart</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+<a href='../index.html' class='back-link'>← Back to Hub</a>
+<header id="title-block-header">
+<h1 class="title">LIMEN-CORE — The System Heart</h1>
+</header>
+<h1 id="limen-core-the-system-heart">LIMEN-CORE — The System
+Heart</h1>
+<p><code>limen-core</code> is the central daemon
+(<code>synapsd</code>) of LIMEN OS. It acts as the primary coordinator
+between voice input, AI processing, the frontend shell, and plugins.</p>
+<hr />
+<h2 id="the-event-bus">1. The Event Bus</h2>
+<p>At its core, <code>synapsd</code> is a high-performance event bus
+built on top of <code>tokio</code> channels.</p>
+<h3 id="message-routing">Message Routing</h3>
+<ol type="1">
+<li><strong>Ingress</strong>: Messages arrive via the Unix socket
+(<code>/run/limen/core.sock</code>), D-Bus, or internal crate
+calls.</li>
+<li><strong>Tagging</strong>: Each message is tagged with a
+<strong>WID</strong> (Waldiez ID) if it doesn’t already have one.</li>
+<li><strong>Dispatch</strong>: The bus identifies the target (Broadcast,
+Specific App, or Plugin) and routes the message.</li>
+<li><strong>Audit</strong>: Every routed message is appended to the
+system event log.</li>
+</ol>
+<hr />
+<h2 id="session-management">2. Session Management</h2>
+<p><code>limen-core</code> maintains the active state of the operating
+system.</p>
+<ul>
+<li><strong>Current Scene</strong>: Tracks which Babylon.js scene is
+active (e.g., <code>home</code>).</li>
+<li><strong>Active Apps</strong>: A registry of currently running PIDs
+and their resource usage.</li>
+<li><strong>User Context</strong>: Short-term memory of recent
+interactions, fed to <code>limen-ai</code> for better intent
+resolution.</li>
+<li><strong>Persistence</strong>: The session state is periodically
+snapshotted to <code>/var/lib/limen/session.json</code>.</li>
+</ul>
+<hr />
+<h2 id="plugin-registry">3. Plugin Registry</h2>
+<p>The core manages the lifecycle of WASM-based plugins.</p>
+<ul>
+<li><strong>Isolation</strong>: Each plugin runs in its own
+<code>wasmtime</code> instance.</li>
+<li><strong>Capabilities</strong>: Plugins must be granted explicit
+permissions in their manifest (e.g., <code>network</code>,
+<code>display</code>).</li>
+<li><strong>Discovery</strong>: On startup, the core scans
+<code>/usr/share/limen/plugins</code> and
+<code>~/.local/share/limen/plugins</code>.</li>
+</ul>
+<hr />
+<h2 id="systemd-integration">4. Systemd Integration</h2>
+<p><code>synapsd</code> is designed to run as a system-level
+service.</p>
+<ul>
+<li><strong>Socket Activation</strong>: Can be started automatically
+when a client connects to the Unix socket.</li>
+<li><strong>Watchdog</strong>: Notifies systemd of its health status
+using <code>sd_notify</code>.</li>
+<li><strong>Resource Control</strong>: Leverages cgroups (via systemd)
+to limit the CPU/Memory impact of background plugins.</li>
+</ul>
+<hr />
+<h2 id="security-ipc">5. Security &amp; IPC</h2>
+<p>Access to the core socket is restricted by filesystem
+permissions.</p>
+<ul>
+<li><strong>Default Group</strong>: <code>limen-api</code></li>
+<li><strong>Encryption</strong>: While local UDS is plain JSON, remote
+companion connections are encrypted using the Waldiez Security Layer
+(WSL).</li>
+</ul>
+</body>
+</html>

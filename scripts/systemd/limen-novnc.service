@@ -1,0 +1,37 @@
+# LIMEN OS — noVNC (browser-based VNC viewer on :6080)
+#
+# Proxies VNC :5900 → WebSocket → browser at http://host:6080/vnc.html
+# Behind nginx: location /vnc/ { proxy_pass http://localhost:6080/; }
+#
+# Requires: limen-x11vnc.service
+#
+# Install:
+#   apt install novnc websockify    # or: pip3 install websockify
+#   cp limen-novnc.service /etc/systemd/system/
+#   systemctl daemon-reload
+#   systemctl enable --now limen-novnc
+
+[Unit]
+Description=LIMEN OS noVNC (browser VNC on :6080)
+After=limen-x11vnc.service
+Requires=limen-x11vnc.service
+
+[Service]
+Type=simple
+
+# websockify ships with novnc; adjust path if installed differently
+ExecStart=/usr/bin/websockify \
+    --web /usr/share/novnc \
+    --heartbeat 30 \
+    6080 \
+    localhost:5900
+
+Restart=on-failure
+RestartSec=3s
+TimeoutStopSec=5s
+
+User=limen
+Group=limen
+
+[Install]
+WantedBy=multi-user.target

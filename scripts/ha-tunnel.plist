@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Limen OS — persistent HA reverse SSH tunnel (macOS launchd)
+
+  Install:
+    make ha-tunnel-install    # installs + loads this plist
+    make ha-tunnel-uninstall  # stops + removes it
+
+  Customise before installing (or set env vars when calling make):
+    HA_LOCAL_HOST   LAN hostname or IP of your HA (default: homeassistant.local)
+    HA_LOCAL_PORT   HA HTTP port                   (default: 8123)
+    EC2_KEY         path to SSH private key        (default: ~/.ssh/id_rsa)
+
+  The tunnel keeps EC2's 127.0.0.1:8124 → your local HA alive.
+  serve.ts reads HA_ORIGIN=http://127.0.0.1:8124 from /etc/limen/serve.env.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>io.waldiez.ha-tunnel</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/ssh</string>
+    <!-- keep-alive: ping every 30s, give up after 3 missed pings -->
+    <string>-o</string><string>ServerAliveInterval=30</string>
+    <string>-o</string><string>ServerAliveCountMax=3</string>
+    <!-- fail fast if the remote port is already in use -->
+    <string>-o</string><string>ExitOnForwardFailure=yes</string>
+    <string>-o</string><string>StrictHostKeyChecking=accept-new</string>
+    <string>-o</string><string>BatchMode=yes</string>
+    <!-- SSH key — edit path if needed -->
+    <string>-i</string><string>__EC2_KEY__</string>
+    <!-- no shell, no TTY -->
+    <string>-N</string>
+    <string>-T</string>
+    <!-- reverse tunnel: EC2:127.0.0.1:8124 → local HA -->
+    <string>-R</string><string>127.0.0.1:8124:__HA_LOCAL_HOST__:__HA_LOCAL_PORT__</string>
+    <string>limen@io.waldiez.io</string>
+  </array>
+
+  <!-- restart automatically on exit -->
+  <key>KeepAlive</key>
+  <true/>
+
+  <!-- start at login -->
+  <key>RunAtLoad</key>
+  <true/>
+
+  <!-- wait 10s before restarting after crash (avoids tight retry loop) -->
+  <key>ThrottleInterval</key>
+  <integer>10</integer>
+
+  <key>StandardOutPath</key>
+  <string>/tmp/limen-ha-tunnel.log</string>
+  <key>StandardErrorPath</key>
+  <string>/tmp/limen-ha-tunnel.err</string>
+</dict>
+</plist>

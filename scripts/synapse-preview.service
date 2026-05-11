@@ -1,0 +1,37 @@
+# LIMEN OS — quick preview server (Bun SPA)
+#
+# Lightweight alternative to limen-static.service for ad-hoc previews.
+# Serves /opt/limen/apps/shell/dist/  (or wherever dist was rsync'd to) on :4173.
+#
+# Install on preview host:
+#   cp limen-preview.service /etc/systemd/system/
+#   systemctl daemon-reload && systemctl enable --now limen-preview
+#
+# Push dist from dev machine:
+#   ./scripts/sync.sh preview user@preview-host
+
+[Unit]
+Description=LIMEN OS quick preview server (Bun SPA)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/limen/apps/shell/dist
+
+# Serves index.html as SPA fallback (unlike Python http.server which 404s).
+# LIMEN_DIST points to the dist directory (= WorkingDirectory here).
+ExecStart=/usr/local/bin/bun /opt/limen/scripts/serve.ts
+Environment=LIMEN_DIST=/opt/limen/apps/shell/dist
+Environment=PORT=4173
+Environment=HOST=0.0.0.0
+
+# Fallback if Bun is not at /usr/local/bin:
+# ExecStart=/usr/bin/python3 -m http.server 4173 --bind 0.0.0.0
+
+Restart=on-failure
+RestartSec=3s
+User=nobody
+Group=nogroup
+
+[Install]
+WantedBy=multi-user.target

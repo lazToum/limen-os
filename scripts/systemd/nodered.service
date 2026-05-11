@@ -1,0 +1,17 @@
+[Unit]
+Description=Node-RED (LIMEN OS)
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=limen
+WorkingDirectory=/home/limen/.node-red
+Environment=HOME=/home/limen
+Environment=PATH=/home/limen/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/usr/bin/node-red --port 1880 --userDir /home/limen/.node-red
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

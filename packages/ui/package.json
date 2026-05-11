@@ -1,0 +1,36 @@
+{
+  "name": "@limen-os/ui",
+  "version": "0.1.0",
+  "description": "LIMEN OS — Babylon.js component library (scenes, shaders, widgets)",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "dev": "tsup src/index.ts --format esm,cjs --dts --watch",
+    "check": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@babylonjs/core": "^8.54.2",
+    "@babylonjs/gui": "^8.54.2",
+    "@babylonjs/materials": "^8.54.2",
+    "@babylonjs/post-processes": "^8.54.2"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  },
+  "peerDependencies": {
+    "@babylonjs/core": "^8.54.2"
+  }
+}

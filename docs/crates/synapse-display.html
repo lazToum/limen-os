@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>LIMEN-DISPLAY — The Window Manager</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+<a href='../index.html' class='back-link'>← Back to Hub</a>
+<header id="title-block-header">
+<h1 class="title">LIMEN-DISPLAY — The Window Manager</h1>
+</header>
+<h1 id="limen-display-the-window-manager">LIMEN-DISPLAY — The Window
+Manager</h1>
+<p><code>limen-display</code> manages the underlying windowing system
+and input routing.</p>
+<hr />
+<h2 id="wayland-integration">1. Wayland Integration</h2>
+<p>LIMEN OS targets Wayland as its primary display protocol. -
+<strong>Compositor</strong>: We interact with <code>wlroots</code> based
+compositors (like Sway/Hyprland) or GNOME’s Mutter via D-Bus. -
+<strong>Layer Shell</strong>: The primary UI (<code>apps/shell</code>)
+uses the <code>layer-shell</code> protocol to stay anchored to the
+background or top-level.</p>
+<hr />
+<h2 id="input-routing">2. Input Routing</h2>
+<p>The display layer routes input from all <a
+href="../architecture/ARCHITECTURE.md">Interaction Modalities</a>: -
+<strong>Gestures</strong>: Mediapipe coordinates are mapped to virtual
+mouse/touch events. - <strong>Focus</strong>:
+<code>limen-display</code> determines which app or scene has input
+focus.</p>
+</body>
+</html>

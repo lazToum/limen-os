@@ -1,0 +1,14 @@
+[package]
+name = "limen-display"
+description = "LIMEN OS display integration — Wayland/X11 bridge, window management"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+tokio.workspace = true
+serde.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+tracing.workspace = true

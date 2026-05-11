@@ -1,0 +1,101 @@
+/.local/
+.tic
+.toc
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+# ── Build outputs ──────────────────────────────────────────────────────────────
+dist/
+build/
+out/
+.output/
+
+# ── Rust / Cargo ───────────────────────────────────────────────────────────────
+target/
+**/*.rs.bk
+Cargo.lock.bak
+
+# ── Tauri ──────────────────────────────────────────────────────────────────────
+apps/shell/src-tauri/target/
+apps/shell/src-tauri/gen/
+# Keep gen/schemas for type safety
+!apps/shell/src-tauri/gen/schemas/
+
+# ── Node / Bun ─────────────────────────────────────────────────────────────────
+node_modules/
+**/node_modules/
+scripts/bun.lock
+.bun/
+*.tsbuildinfo
+
+# ── Flutter web build (generated, embedded in shell public/) ──────────────────
+apps/shell/public/mobile/
+
+# ── Flutter / Dart ─────────────────────────────────────────────────────────────
+apps/mobile/.dart_tool/
+apps/mobile/.flutter-plugins
+apps/mobile/.flutter-plugins-dependencies
+apps/mobile/build/
+apps/mobile/android/.gradle/
+apps/mobile/android/local.properties
+apps/mobile/ios/.symlinks/
+apps/mobile/ios/Pods/
+apps/mobile/ios/Runner.xcworkspace/xcuserdata/
+
+# ── Environment / Secrets ──────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+secrets/
+
+# ── Editor & OS ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+*.swo
+*~
+.idea/
+.vagrant/
+
+# ── Logs & temp ───────────────────────────────────────────────────────────────
+*.log
+logs/
+tmp/
+.tmp/
+*.tmp
+
+# ── WASM artifacts ────────────────────────────────────────────────────────────
+*.wasm
+!packages/ui/src/**/*.wasm
+
+# ── Docs generated output ─────────────────────────────────────────────────────
+!docs/api/
+docs/rustdoc/
+.ec2.env
+.laptop.env
+docker/code-server/data/
+docker/code-server/userdata/
+docker/tools/agentflow/.ruff_cache/
+docker/tools/agentflow/static/app/assets/
+
+# ── Sourcemaps and linter caches ──────────────────────────────────────────────
+**/*.js.map
+**/*.css.map
+**/.eslintcache
+**/.stylelintcache
+
+# ── Vendored external sources (populate with: make vendor) ────────────────────
+# Populated from an external limen code repo before Docker builds.
+# Run `make vendor LIMEN_CODE_DIR=/path/to/limen/code/limen` then `make push`.
+services/smartcities/vendor/demo/*
+services/smartcities/vendor/saf/*
+services/sinergym/vendor/sinergym/*
+!services/smartcities/vendor/demo/.gitkeep
+!services/smartcities/vendor/saf/.gitkeep
+!services/sinergym/vendor/sinergym/.gitkeep

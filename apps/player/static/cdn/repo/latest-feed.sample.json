@@ -1,0 +1,24 @@
+{
+    "generatedAt": "2026-02-28T12:30:00.000Z",
+    "mode": "storm",
+    "descriptionName": "Waldiez Repo - Latest (News Pulse)",
+    "descriptionPurpose": "Auto-generated latest preset from a news-oriented feed.",
+    "tags": ["waldiez", "player", "latest", "news", "auto-generated", "cron"],
+    "lifecycleNote": "Update from your upstream news/music classifier feed.",
+    "eq": { "bass": 1, "mid": 1, "treble": 1 },
+    "fx": { "reverb": false, "echo": false, "fuzz": false, "vinyl": false },
+    "validation": {
+        "maxAgeHours": 72,
+        "minKeywordHits": 1,
+        "newsKeywords": ["news", "breaking", "headlines", "report", "live", "world", "politics"],
+        "trustedChannels": ["BBC News", "Reuters", "Associated Press", "Al Jazeera English", "DW News"],
+        "requireTrustedChannel": false,
+        "llmMinScore": 70
+    },
+    "moodCustomizations": {},
+    "tracks": [
+        { "mood": "storm", "videoId": "btPJPFnesV4", "name": "Breaking Edge" },
+        { "mood": "storm", "videoId": "4xiWvdwsCBQ", "name": "Breaking Feed 01" },
+        { "mood": "storm", "videoId": "dZNekHrcMPc", "name": "Breaking Feed 02" }
+    ]
+}

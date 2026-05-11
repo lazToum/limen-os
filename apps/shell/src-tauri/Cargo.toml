@@ -1,0 +1,51 @@
+[package]
+name = "limen-shell"
+description = "LIMEN OS desktop shell — Tauri v2 backend"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[lib]
+name = "limen_shell_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[[bin]]
+name = "limen-shell"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build.workspace = true
+
+[dependencies]
+# Workspace
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+# Tauri
+tauri.workspace = true
+tauri-plugin-shell = "2.3.5"
+# specta / tauri-specta re-add in Phase 3 when generating TS bindings
+
+# LIMEN crates
+limen-core = { path = "../../../crates/limen-core" }
+limen-ai = { path = "../../../crates/limen-ai" }
+limen-voice = { path = "../../../crates/limen-voice" }
+
+# System info for get_sysinfo command
+sysinfo.workspace = true
+
+# Platform config dir (~/.<config>/limen/) for setup persistence
+dirs = "5.0"
+
+#   // plugins: {
+#   //   updater: {
+#   //     pubkey: 'updater pub key',
+#   //     endpoints: ['https://my.app.updater/{{target}}/{{current_version}}'],
+#   //   },
+#   // },

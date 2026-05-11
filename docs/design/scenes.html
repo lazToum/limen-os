@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>SCENES — Visual State Specification</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+<a href='../index.html' class='back-link'>← Back to Hub</a>
+<header id="title-block-header">
+<h1 class="title">SCENES — Visual State Specification</h1>
+</header>
+<h1 id="scenes-visual-state-specification">SCENES — Visual State
+Specification</h1>
+<p>LIMEN OS organizes its interface into distinct <strong>Babylon.js
+Scenes</strong>. Each scene is a full render context with its own
+camera, lights, meshes, and GUI layer. Only one scene is “active” at a
+time, though the previous scene is kept warm in memory for instant
+back-navigation.</p>
+<hr />
+<h2 id="scene-inventory">Scene Inventory</h2>
+<table>
+<thead>
+<tr>
+<th>Scene</th>
+<th>ID</th>
+<th>Trigger</th>
+<th>Resident?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Home</td>
+<td><code>home</code></td>
+<td>Wake from greeter / “go home”</td>
+<td>Always</td>
+</tr>
+<tr>
+<td>Greeter</td>
+<td><code>greeter</code></td>
+<td>Session start / lock</td>
+<td>Always</td>
+</tr>
+<tr>
+<td>Launcher</td>
+<td><code>launcher</code></td>
+<td>“Show my apps” / Start menu</td>
+<td>Lazy</td>
+</tr>
+<tr>
+<td>Ambient</td>
+<td><code>ambient</code></td>
+<td>Idle timeout</td>
+<td>Lazy</td>
+</tr>
+<tr>
+<td>Voice</td>
+<td><code>voice</code></td>
+<td>Wake word detected</td>
+<td>Lazy overlay</td>
+</tr>
+<tr>
+<td>Focus</td>
+<td><code>focus</code></td>
+<td>App maximized</td>
+<td>Lazy</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="home-scene">1. Home Scene</h2>
+<p>The <strong>primary resident scene</strong> — the desktop you live
+in.</p>
+<h3 id="visual">Visual</h3>
+<ul>
+<li><strong>Background</strong>: Slowly drifting particle nebula
+(density controlled by paradigm).</li>
+<li><strong>Widget dock</strong>: Orbital ring of app icons,
+auto-arranged, floats at 20% from bottom. Widgets snap to orbit
+positions; dragging re-orders them.</li>
+<li><strong>Wallpaper layer</strong>: Static or animated (Babylon.js
+particle system or GLSL shader), configurable per paradigm.</li>
+<li><strong>Active windows</strong>: Rendered as React DOM overlays on
+top of the Babylon canvas. Windows have translucent glass chrome
+(backdrop-filter blur).</li>
+</ul>
+<h3 id="camera">Camera</h3>
+<ul>
+<li><strong>Orthographic top-down</strong> in
+<code>minimal</code>/<code>unix</code> paradigms.</li>
+<li><strong>Slight perspective</strong> (FOV 40°, z-tilt 3°) in
+<code>nebula</code>/<code>calm</code> for depth.</li>
+</ul>
+<h3 id="state">State</h3>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">interface</span> HomeSceneState {</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  wallpaper<span class="op">:</span> WallpaperConfig<span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  widgetPositions<span class="op">:</span> <span class="bu">Record</span><span class="op">&lt;</span><span class="dt">string</span><span class="op">,</span> Vec2<span class="op">&gt;;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  openWindows<span class="op">:</span> WindowState[]<span class="op">;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  activeWindowId<span class="op">:</span> <span class="dt">string</span> <span class="op">|</span> <span class="dt">null</span><span class="op">;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<h3 id="transitions-in">Transitions In</h3>
+<ul>
+<li>From <code>greeter</code>: 600ms cross-dissolve + slight camera
+zoom-out.</li>
+<li>From <code>launcher</code>: App icon flies to origin; rest of
+launcher grid fades.</li>
+<li>From <code>ambient</code>: Ambient particles slow, re-configure to
+home layout (400ms).</li>
+</ul>
+<hr />
+<h2 id="greeter-scene">2. Greeter Scene</h2>
+<p>The <strong>session start / lock screen</strong>.</p>
+<h3 id="visual-1">Visual</h3>
+<ul>
+<li><strong>Aurora curtain</strong>: GLSL fragment shader — vertical
+bands of color (paradigm palette) that sway slowly.</li>
+<li><strong>Time display</strong>: Large clock, center stage. Seconds
+pulse with a soft glow.</li>
+<li><strong>User avatar</strong>: Detected via MediaPipe face
+recognition or fallback to icon.</li>
+<li><strong>Voice indicator</strong>: Subtle pulsing ring around the
+clock — always listening for the wake word.</li>
+</ul>
+<h3 id="interactions">Interactions</h3>
+<ul>
+<li><strong>Face recognition</strong>: Auto-unlock when the registered
+user is detected with high confidence (≥ 0.92).</li>
+<li><strong>Voice</strong>: “Hey Limen, unlock” → PIN/passphrase
+prompt via voice.</li>
+<li><strong>Touch/click</strong>: PIN pad or passphrase keyboard.</li>
+<li><strong>TUI</strong>: On SSH connect, session proceeds directly
+without greeter.</li>
+</ul>
+<h3 id="state-1">State</h3>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">interface</span> GreeterSceneState {</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  faceRecognitionActive<span class="op">:</span> <span class="dt">boolean</span><span class="op">;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  unlockAttempts<span class="op">:</span> <span class="dt">number</span><span class="op">;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  lastSeenUserId<span class="op">:</span> <span class="dt">string</span> <span class="op">|</span> <span class="dt">null</span><span class="op">;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<h3 id="lockout-policy">Lockout Policy</h3>
+<p>After 5 failed unlock attempts: 60-second cooldown with escalating
+backoff. The system speaks: <em>“Too many attempts. I’ll try again in 60
+seconds.”</em></p>
+<hr />
+<h2 id="launcher-scene">3. Launcher Scene</h2>
+<p>The <strong>application grid</strong> — what you see when you say
+<em>“show my apps”</em>.</p>
+<h3 id="visual-2">Visual</h3>
+<ul>
+<li><strong>3D card grid</strong>: App icons rendered as Babylon.js GUI
+planes, arranged in a responsive hex-grid (adapts to window count).</li>
+<li><strong>Category tabs</strong>: Pinned at top — All, System, Games,
+Media, AI, Settings.</li>
+<li><strong>Search bar</strong>: Auto-focuses on open; filters cards in
+real-time (fuzzy match).</li>
+<li><strong>Voice search</strong>: Spoken while launcher is open →
+filters immediately.</li>
+</ul>
+<h3 id="camera-1">Camera</h3>
+<ul>
+<li><strong>Perspective</strong> (FOV 50°), camera positioned slightly
+above center looking down-forward.</li>
+<li>On hover: card under cursor lifts 4px with a shadow bloom. On click:
+card zooms to fill screen then transitions to Focus scene.</li>
+</ul>
+<h3 id="interactions-1">Interactions</h3>
+<pre class="text"><code>Voice: &quot;Open [app name]&quot;         → launches app, closes launcher
+Voice: &quot;Close&quot;                   → closes launcher, returns to Home
+Keyboard: type to search         → live filter
+Keyboard: Enter                  → opens first result
+Keyboard: Escape / Win           → closes launcher</code></pre>
+<h3 id="transitions">Transitions</h3>
+<ul>
+<li><strong>Open</strong>: Home widgets orbit inward (200ms), launcher
+grid fans out from center (300ms stagger).</li>
+<li><strong>Close</strong>: Grid cards collapse inward (200ms), home
+scene resumes.</li>
+<li><strong>Launch</strong>: Selected card expands to fullscreen
+(300ms), then Focus scene cross-fades in.</li>
+</ul>
+<hr />
+<h2 id="ambient-scene">4. Ambient Scene</h2>
+<p>The <strong>screensaver</strong> — activates after idle timeout
+(default: 5 minutes).</p>
+<h3 id="visual-3">Visual</h3>
+<p>Three ambient modes (cycles or stays fixed per preference):</p>
+<table>
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 73%" />
+</colgroup>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cosmos</code></td>
+<td>Slow flythrough of 3D star field. Clock rendered as constellation
+lines.</td>
+</tr>
+<tr>
+<td><code>generative</code></td>
+<td>GLSL generative art — flowing noise fields, reaction-diffusion.</td>
+</tr>
+<tr>
+<td><code>clock</code></td>
+<td>Minimal full-screen clock (paradigm palette). Weather overlay if
+network available.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="wake-conditions">Wake Conditions</h3>
+<p>Any of the following returns to Home scene immediately:</p>
+<ul>
+<li>Wake word detected</li>
+<li>Face present (MediaPipe person detection)</li>
+<li>Touch / mouse move / key press</li>
+<li>Mobile companion activity</li>
+</ul>
+<h3 id="state-preservation">State Preservation</h3>
+<p>Home scene state is fully preserved — ambient is a
+<strong>non-destructive overlay</strong>. Windows remain open, audio
+continues.</p>
+<hr />
+<h2 id="voice-scene">5. Voice Scene</h2>
+<p>A <strong>non-blocking overlay</strong> that appears during active
+voice interaction. It does not replace the current scene — it renders on
+top.</p>
+<h3 id="visual-4">Visual</h3>
+<ul>
+<li><strong>Waveform orb</strong>: A glowing sphere that responds to
+microphone amplitude in real-time. Spikes outward on loud input,
+contracts during silence.</li>
+<li><strong>Transcript strip</strong>: Rolling text at the bottom
+showing live partial transcription.</li>
+<li><strong>Intent chip</strong>: Once intent is classified, a pill
+appears: <code>open_app: terminal</code> or
+<code>ai_query: "what's the weather?"</code>.</li>
+<li><strong>Confidence ring</strong>: Colored arc around the orb — green
+(high confidence) to amber (uncertain).</li>
+</ul>
+<h3 id="lifecycle">Lifecycle</h3>
+<pre class="text"><code>wake_word_detected
+  → VoiceScene.show() [100ms fade-in]
+    → waveform animates
+    → transcript appears (streaming)
+      → intent classified
+        → action dispatched
+          → VoiceScene.hide() [200ms fade-out]
+            → result shown as notification</code></pre>
+<h3 id="error-state">Error State</h3>
+<p>If STT fails or confidence &lt; 0.6: - Orb turns amber - Text: <em>“I
+didn’t catch that — try again?”</em> - After 2 failures: <em>“Want to
+type it instead?”</em> — keyboard prompt appears in Voice overlay.</p>
+<hr />
+<h2 id="focus-scene">6. Focus Scene</h2>
+<p>Activated when an app is <strong>maximized</strong>. Provides minimal
+chrome to reduce distraction.</p>
+<h3 id="visual-5">Visual</h3>
+<ul>
+<li>Window fills the full canvas (minus a thin title bar, 28px).</li>
+<li><strong>Home widget dock</strong>: Hidden. Single icon in top-right
+corner to return to Home.</li>
+<li><strong>Background</strong>: Black or very dark paradigm color — no
+particles, no wallpaper.</li>
+<li><strong>Title bar</strong>: App name + icon. Window controls
+(minimize, restore, close).</li>
+</ul>
+<h3 id="quick-return">Quick-Return</h3>
+<ul>
+<li><code>Alt</code>+<code>Tab</code>: Cycle open apps (Focus scene
+renders the switcher overlay).</li>
+<li>Voice: <em>“go home”</em>, <em>“minimize”</em>, <em>“switch to
+[app]”</em>.</li>
+<li>Swipe left from edge (touch/gesture).</li>
+</ul>
+<hr />
+<h2 id="scene-memory-budget">7. Scene Memory Budget</h2>
+<pre class="text"><code>Always resident (never disposed):
+  greeter, home
+
+Lazy-loaded, kept warm for 2 minutes:
+  launcher, ambient, voice, focus
+
+Disposed after 5 minutes inactivity:
+  launcher, ambient, focus
+  (voice is lightweight and always re-created)</code></pre>
+<p>Memory pressure eviction order: <code>ambient</code> →
+<code>launcher</code> → <code>focus</code>.</p>
+<hr />
+<h2 id="scene-transition-matrix">8. Scene Transition Matrix</h2>
+<table>
+<thead>
+<tr>
+<th>From → To</th>
+<th>Method</th>
+<th>Duration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>greeter → home</td>
+<td>cross-dissolve + camera zoom</td>
+<td>600ms</td>
+</tr>
+<tr>
+<td>home → launcher</td>
+<td>orbit collapse + card fan</td>
+<td>500ms</td>
+</tr>
+<tr>
+<td>launcher → home</td>
+<td>card collapse</td>
+<td>300ms</td>
+</tr>
+<tr>
+<td>home → ambient</td>
+<td>fade</td>
+<td>400ms</td>
+</tr>
+<tr>
+<td>ambient → home</td>
+<td>instant + fade</td>
+<td>200ms</td>
+</tr>
+<tr>
+<td>home → focus</td>
+<td>app card expand</td>
+<td>300ms</td>
+</tr>
+<tr>
+<td>focus → home</td>
+<td>reverse expand</td>
+<td>300ms</td>
+</tr>
+<tr>
+<td>any → voice</td>
+<td>overlay fade-in</td>
+<td>100ms</td>
+</tr>
+<tr>
+<td>voice → any</td>
+<td>overlay fade-out</td>
+<td>200ms</td>
+</tr>
+</tbody>
+</table>
+<p>All transitions respect <code>prefers-reduced-motion</code>: when
+set, all durations collapse to 0ms (instant cuts) except the voice
+overlay which retains 50ms to avoid jarring pops.</p>
+</body>
+</html>

@@ -1,0 +1,22 @@
+[Unit]
+Description=Limen TUI via ttyd (LIMEN OS)
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=limen
+WorkingDirectory=/opt/limen
+Environment=HOME=/home/limen
+Environment=PATH=/home/limen/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/usr/local/bin/ttyd \
+    --port 7681 \
+    --interface 127.0.0.1 \
+    --base-path /tui \
+    --writable \
+    /opt/limen/target/release/limen-tui
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

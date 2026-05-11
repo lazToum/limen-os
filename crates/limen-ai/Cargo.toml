@@ -1,0 +1,32 @@
+[package]
+name = "limen-ai"
+description = "LIMEN OS AI orchestration — multi-model router, intent recognition, context"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[features]
+default = ["claude", "openai"]
+claude = []
+openai = []
+gemini = []
+deepseek = []
+groq = []
+local = []
+
+[dependencies]
+# Workspace
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+reqwest.workspace = true
+futures.workspace = true
+parking_lot.workspace = true
+
+# Anthropic (using raw reqwest — official SDK requires Tokio 1 which we have)
+# async-openai for OpenAI-compatible endpoints (Groq, Deepseek, Mistral all support this)
+async-openai.workspace = true

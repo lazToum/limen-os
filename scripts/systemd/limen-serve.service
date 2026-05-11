@@ -1,0 +1,85 @@
+# LIMEN OS — Production SPA + proxy server (Bun)
+#
+# Serves apps/shell/dist/ + reverse-proxies HA, Jupyter, VS Code, Studio, etc.
+# Requires the Docker stack to be running: docker compose -f docker/stack.yml up -d
+#
+# Install (as root):
+#   cp /opt/limen/scripts/systemd/limen-serve.service /etc/systemd/system/
+#   systemctl daemon-reload && systemctl enable --now limen-serve
+#
+# Override env without editing this file:
+#   mkdir -p /etc/systemd/system/limen-serve.service.d/
+#   echo '[Service]' > /etc/systemd/system/limen-serve.service.d/local.conf
+#   echo 'Environment=PORT=80' >> ...
+#
+# Secrets go in /etc/limen/serve.env (not committed to git):
+#   LIMEN_TLS_CERT=/etc/letsencrypt/live/io.waldiez.io/fullchain.pem
+#   LIMEN_TLS_KEY=/etc/letsencrypt/live/io.waldiez.io/privkey.pem
+#   ANTHROPIC_API_KEY=...
+#   LIMEN_MQTT_USER=limen
+#   LIMEN_MQTT_PASS=...
+
+[Unit]
+Description=LIMEN OS — SPA server + reverse proxy (Bun)
+Documentation=https://github.com/waldiez/limen-os
+After=network-online.target docker.service
+Wants=network-online.target
+# Wait for Docker stack (HA container) to be up before starting
+After=limen-stack.service
+Wants=limen-stack.service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/limen
+
+ExecStart=/home/limen/.bun/bin/bun /opt/limen/scripts/serve.ts
+
+# ── Core paths ────────────────────────────────────────────────────────────────
+Environment=LIMEN_DIST=/opt/limen/apps/shell/dist
+Environment=PLAYER_DIST=/opt/limen/player/dist
+Environment=PORT=1420
+Environment=HOST=0.0.0.0
+
+# ── Upstream services (Docker stack ports bound to 127.0.0.1) ─────────────────
+# HA runs as a container exposing 127.0.0.1:8123 (Docker default)
+# To use local LAN HA via ha-tunnel.sh, override in /etc/limen/serve.env:
+#   HA_ORIGIN=http://127.0.0.1:8124
+#   HA_PORT=8124
+Environment=HA_ORIGIN=http://127.0.0.1:8123
+Environment=HA_PORT=8123
+# code-server at 127.0.0.1:8080
+Environment=CODE_SERVER_PORT=8080
+# JupyterLab (waldiez/jupyter, --ServerApp.base_url=/jupyter/) at 127.0.0.1:8888
+Environment=JUPYTER_PORT=8888
+# Waldiez Studio at 127.0.0.1:8001
+Environment=STUDIO_PORT=8001
+# AgentFlow/Defaault monitor backend at 127.0.0.1:8889
+Environment=AF_PORT=8889
+# MQTT over WebSocket at 127.0.0.1:9001
+Environment=VITE_MQTT_WS_PORT=9001
+# Whisper STT at 127.0.0.1:8083
+Environment=WHISPER_PORT=8083
+# Node-RED at 127.0.0.1:1880
+Environment=NODERED_PORT=1880
+# VS Code HTTPS wrapper port (only spun up when TLS certs set)
+Environment=CODE_SERVER_HTTPS_PORT=8081
+
+# ── Secrets + TLS (override via /etc/limen/serve.env) ──────────────────────
+# Set LIMEN_TLS_CERT + LIMEN_TLS_KEY for HTTPS (required for mic/camera).
+# Use Let's Encrypt (certbot) or self-signed. See scripts/setup.sh for certbot setup.
+EnvironmentFile=-/etc/limen/serve.env
+
+# ── Process supervision ───────────────────────────────────────────────────────
+Restart=on-failure
+RestartSec=3s
+TimeoutStartSec=15s
+TimeoutStopSec=10s
+
+User=limen
+Group=limen
+# Ensure log dir exists before starting
+ExecStartPre=/bin/mkdir -p /var/log/limen
+ExecStartPre=/bin/chown limen:limen /var/log/limen
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,176 @@
+/**
+ * useMoodPersistence — per-mode playlist loading + auto-save for mood modes.
+ *
+ * On `mode` change:
+ *   1. Reads wideria-prefs for saved session tracks → loads them
+ *   2. Falls back to user-saved defaults
+ *   3. Falls back to hardcoded MODE_DEFAULTS from kideria/web/player.js
+ *   4. Resolves "YouTube · ID" placeholder names via oEmbed (background)
+ *
+ * Auto-saves to wideria-prefs whenever the library changes (debounced 500ms).
+ *
+ * Returns:
+ *   saveAsDefault() — saves the current playlist as the user-defined default
+ *   for the current mode (mirrors kideria's "★ Save as default" button).
+ */
+import {
+    NEWS_MOOD,
+    fetchYouTubeTitle,
+    loadModeTracklist,
+    refreshLatestWidIfStale,
+    saveDefaultForMode,
+    saveModeTracksToPrefs,
+} from "@/lib/moodDefaults";
+import { usePlayerStore } from "@/stores";
+import type { MoodMode } from "@/types/mood";
+
+import { useCallback, useEffect, useRef } from "react";
+
+const DEBOUNCE_MS = 500;
+
+export function useMoodPersistence(mode: MoodMode) {
+    const modeRef = useRef(mode);
+    const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    // Prevents the load-triggered library change from starting a save cycle
+    const isLoading = useRef(false);
+
+    useEffect(() => {
+        modeRef.current = mode;
+    }, [mode]);
+
+    // ── Load tracklist on mode change ──────────────────────────────────────
+    useEffect(() => {
+        const store = usePlayerStore.getState();
+
+        const { files, currentId, currentTime } = loadModeTracklist(mode);
+
+        // Pause playback before switching; restore saved position if available
+        store.setPlayback({ isPlaying: false, currentTime: currentTime ?? 0, duration: 0 });
+
+        isLoading.current = true;
+        store.setMediaLibrary(files);
+        // setMediaLibrary is synchronous in Zustand, so we can reset immediately
+        isLoading.current = false;
+
+        // Restore last-playing track; fall back to first track in playlist
+        if (currentId) {
+            const match = files.find(f => f.youtubeId === currentId);
+            store.setCurrentMedia(match ?? files[0] ?? null);
+        } else {
+            store.setCurrentMedia(files[0] ?? null);
+        }
+
+        // Background: resolve "YouTube · ID" → actual video title via oEmbed
+        files.forEach((file, idx) => {
+            if (file.source === "youtube" && file.youtubeId && file.name.startsWith("YouTube · ")) {
+                fetchYouTubeTitle(file.youtubeId).then(title => {
+                    if (!title) return;
+                    // Update just that entry's name in the current library
+                    const lib = usePlayerStore.getState().mediaLibrary;
+                    const updated = lib.map((f, i) =>
+                        i === idx && f.id === file.id ? { ...f, name: title } : f,
+                    );
+                    usePlayerStore.getState().setMediaLibrary(updated);
+                });
+            }
+        });
+    }, [mode]);
+
+    // ── Subscribe to library changes and auto-save ─────────────────────────
+    useEffect(() => {
+        const unsub = usePlayerStore.subscribe(_state => {
+            if (isLoading.current) return;
+
+            if (saveTimer.current) clearTimeout(saveTimer.current);
+            saveTimer.current = setTimeout(() => {
+                const { mediaLibrary, currentMedia, playback } = usePlayerStore.getState();
+                saveModeTracksToPrefs(modeRef.current, mediaLibrary, currentMedia, {
+                    volume: playback.volume,
+                    muted: playback.isMuted,
+                    t: playback.currentTime,
+                });
+            }, DEBOUNCE_MS);
+        });
+
+        return () => {
+            unsub();
+            if (saveTimer.current) clearTimeout(saveTimer.current);
+        };
+    }, []);
+
+    // ── Periodically refresh latest-auto.wid (visibility, online, 1-hour) ──
+    // Fires when the user returns to a tab/PWA that has been in the background
+    // for more than 1 hour, or when the device comes back online.
+    useEffect(() => {
+        async function tryRefresh() {
+            const updated = await refreshLatestWidIfStale();
+            if (updated && modeRef.current === NEWS_MOOD) {
+                // Re-read prefs and reload the live playlist so the user sees
+                // the new news tracks without having to switch modes.
+                const store = usePlayerStore.getState();
+                const { files, currentId } = loadModeTracklist(modeRef.current);
+                isLoading.current = true;
+                store.setMediaLibrary(files);
+                isLoading.current = false;
+                if (currentId) {
+                    store.setCurrentMedia(files.find(f => f.youtubeId === currentId) ?? files[0] ?? null);
+                }
+            }
+        }
+
+        function onVisible() {
+            if (document.visibilityState === "visible") void tryRefresh();
+        }
+        function onOnline() {
+            void tryRefresh();
+        }
+
+        const intervalId = setInterval(() => void tryRefresh(), 60 * 60 * 1000);
+        document.addEventListener("visibilitychange", onVisible);
+        window.addEventListener("online", onOnline);
+
+        return () => {
+            clearInterval(intervalId);
+            document.removeEventListener("visibilitychange", onVisible);
+            window.removeEventListener("online", onOnline);
+        };
+    }, []);
+
+    // ── Reload tracklist from prefs (e.g. after import) ───────────────────
+    const reloadTracklist = useCallback(() => {
+        const store = usePlayerStore.getState();
+        const m = modeRef.current;
+        const { files, currentId } = loadModeTracklist(m);
+
+        isLoading.current = true;
+        store.setMediaLibrary(files);
+        isLoading.current = false;
+
+        if (currentId) {
+            const match = files.find(f => f.youtubeId === currentId);
+            store.setCurrentMedia(match ?? files[0] ?? null);
+        } else {
+            store.setCurrentMedia(files[0] ?? null);
+        }
+
+        files.forEach((file, idx) => {
+            if (file.source === "youtube" && file.youtubeId && file.name.startsWith("YouTube · ")) {
+                fetchYouTubeTitle(file.youtubeId).then(title => {
+                    if (!title) return;
+                    const lib = usePlayerStore.getState().mediaLibrary;
+                    const updated = lib.map((f, i) =>
+                        i === idx && f.id === file.id ? { ...f, name: title } : f,
+                    );
+                    usePlayerStore.getState().setMediaLibrary(updated);
+                });
+            }
+        });
+    }, []);
+
+    // ── Save as default ────────────────────────────────────────────────────
+    const saveAsDefault = useCallback(() => {
+        saveDefaultForMode(modeRef.current, usePlayerStore.getState().mediaLibrary);
+    }, []);
+
+    return { saveAsDefault, reloadTracklist };
+}

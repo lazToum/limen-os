@@ -1,0 +1,159 @@
+<svg
+  class="af-icon"
+  viewBox="0 0 32 32"
+  width="32"
+  height="32"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  aria-label="Workers"
+  role="img"
+>
+  <style>
+    /*
+     * AgentFlow / Workers icon — wid.svg × workers.svg blend
+     * Waldiez W (draw-on + orbital spin) merged with network graph
+     * (central blue node + teal + violet satellites).
+     * No global selectors — all scoped to svg.af-icon.
+     */
+
+    svg.af-icon {
+      overflow: visible;
+      filter: drop-shadow(0 2px 10px rgba(99, 102, 241, 0.35));
+      animation: af-breathe 3s ease-in-out infinite;
+    }
+
+    /* Orbital ring spinning dot */
+    svg.af-icon .af-spin {
+      transform-origin: 16px 15px;
+      animation: af-spin 10s linear infinite;
+    }
+    @keyframes af-spin { to { transform: rotate(360deg); } }
+
+    /* W draw-on strokes */
+    svg.af-icon .af-stroke {
+      stroke-dasharray: 40;
+      stroke-dashoffset: 40;
+      stroke-linecap: round;
+      stroke-width: 2;
+      animation: af-draw 1.4s ease-out forwards;
+    }
+    svg.af-icon .af-s1 { animation-delay: 0.00s; }
+    svg.af-icon .af-s2 { animation-delay: 0.10s; }
+    svg.af-icon .af-s3 { animation-delay: 0.20s; }
+    svg.af-icon .af-s4 { animation-delay: 0.30s; }
+    svg.af-icon .af-s5 { animation-delay: 0.40s; }
+    svg.af-icon .af-s6 { animation-delay: 0.50s; }
+    @keyframes af-draw { to { stroke-dashoffset: 0; } }
+
+    /* Node pulses — staggered */
+    svg.af-icon .af-node-main   { animation: af-pulse 2.6s ease-in-out 1.2s infinite; }
+    svg.af-icon .af-node-teal   { animation: af-pulse 2.6s ease-in-out 0.3s infinite; }
+    svg.af-icon .af-node-violet { animation: af-pulse 2.6s ease-in-out 0.8s infinite; }
+    @keyframes af-pulse { 0%,100% { opacity: 0.82; } 50% { opacity: 1; } }
+
+    /* Outer glow breathe */
+    @keyframes af-breathe {
+      0%,100% { filter: drop-shadow(0 2px 10px rgba(99,102,241,0.35)); }
+      50%      { filter: drop-shadow(0 3px 16px rgba(99,102,241,0.62)); }
+    }
+
+    /* Edge flow */
+    svg.af-icon .af-edge       { stroke-dasharray: 3 2.5; animation: af-flow 1.6s linear infinite; }
+    svg.af-icon .af-edge-cross { stroke-dasharray: 2.5 4; animation: af-flow 2.4s linear infinite reverse; }
+    @keyframes af-flow { to { stroke-dashoffset: -11; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      svg.af-icon,
+      svg.af-icon .af-spin,
+      svg.af-icon .af-stroke,
+      svg.af-icon .af-node-main,
+      svg.af-icon .af-node-teal,
+      svg.af-icon .af-node-violet,
+      svg.af-icon .af-edge,
+      svg.af-icon .af-edge-cross { animation: none !important; }
+      svg.af-icon .af-stroke { stroke-dashoffset: 0; }
+    }
+  </style>
+
+  <defs>
+    <radialGradient id="af-bg" cx="50%" cy="38%" r="70%">
+      <stop offset="0%"   stop-color="#0d1a38"/>
+      <stop offset="100%" stop-color="#04080f"/>
+    </radialGradient>
+
+    <!-- W gradients — indigo → purple → pink -->
+    <linearGradient id="af-g1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <linearGradient id="af-g2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+
+    <!-- Central node halo -->
+    <radialGradient id="af-ng" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#60a5fa" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#2563eb" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="af-glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="0.9" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="af-softglow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="1.3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="32" height="32" rx="7" fill="url(#af-bg)"/>
+
+  <!-- Orbital ellipse -->
+  <ellipse cx="16" cy="15" rx="13" ry="6"
+    stroke="rgba(255,255,255,0.10)" stroke-width="0.5"
+    stroke-dasharray="1.5 2.5" fill="none"/>
+  <!-- Spinning accent dot -->
+  <g class="af-spin">
+    <circle cx="29" cy="15" r="1.4" fill="#8b5cf6" opacity="0.55"/>
+  </g>
+
+  <!-- W strokes (drawn on, semi-translucent) -->
+  <g opacity="0.72">
+    <path class="af-stroke af-s1" d="M 3 5 L 8 24"    stroke="url(#af-g1)"/>
+    <path class="af-stroke af-s2" d="M 8 24 L 13 10"  stroke="url(#af-g1)"/>
+    <path class="af-stroke af-s3" d="M 13 10 L 16 19" stroke="url(#af-g2)"/>
+    <path class="af-stroke af-s4" d="M 16 19 L 19 10" stroke="url(#af-g2)"/>
+    <path class="af-stroke af-s5" d="M 19 10 L 24 24" stroke="url(#af-g2)"/>
+    <path class="af-stroke af-s6" d="M 24 24 L 29 5"  stroke="url(#af-g2)"/>
+  </g>
+
+  <!-- Network edges -->
+  <line class="af-edge"       x1="16" y1="13" x2="8.5" y2="23.5" stroke="#4a7abf" stroke-width="1"   stroke-linecap="round" opacity="0.55"/>
+  <line class="af-edge"       x1="16" y1="13" x2="23.5" y2="23.5" stroke="#6a5abf" stroke-width="1"  stroke-linecap="round" opacity="0.55"/>
+  <line class="af-edge-cross" x1="8.5" y1="23.5" x2="23.5" y2="23.5" stroke="#3a4a70" stroke-width="0.7" stroke-linecap="round" opacity="0.38"/>
+
+  <!-- Satellite node — teal -->
+  <g class="af-node-teal">
+    <circle cx="8.5" cy="23.5" r="2.9" fill="#22d3a0" filter="url(#af-glow)" opacity="0.88"/>
+    <circle cx="8.5" cy="23.5" r="1.3" fill="#a7f3d0"/>
+  </g>
+
+  <!-- Satellite node — violet -->
+  <g class="af-node-violet">
+    <circle cx="23.5" cy="23.5" r="2.9" fill="#818cf8" filter="url(#af-glow)" opacity="0.88"/>
+    <circle cx="23.5" cy="23.5" r="1.3" fill="#c4b5fd"/>
+  </g>
+
+  <!-- Central node — blue (main actor) -->
+  <circle cx="16" cy="13" r="5" fill="url(#af-ng)"/>
+  <g class="af-node-main">
+    <circle cx="16" cy="13" r="3.8" fill="#2563eb" filter="url(#af-softglow)"/>
+    <circle cx="16" cy="13" r="2"   fill="#93c5fd"/>
+    <circle cx="14.9" cy="11.9" r="0.8" fill="white" opacity="0.5"/>
+  </g>
+
+  <!-- Rim -->
+  <rect width="32" height="32" rx="7" stroke="#6366f1" stroke-width="0.4" fill="none" opacity="0.18"/>
+</svg>

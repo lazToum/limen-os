@@ -1,0 +1,31 @@
+{
+  "name": "limen-os",
+  "version": "0.1.0",
+  "private": true,
+  "description": "LIMEN OS — Voice-first, AI-native, beautiful desktop shell",
+  "packageManager": "bun@1.3.10",
+  "workspaces": [
+    "apps/shell",
+    "apps/player",
+    "apps/player/packages/editor-core",
+    "packages/ui",
+    "packages/voice-client",
+    "packages/ai-client",
+    "packages/smart-cities-client"
+  ],
+  "scripts": {
+    "dev": "bun run --filter '*' dev",
+    "build": "bun run --filter '*' build",
+    "check": "bun run --filter '*' check",
+    "test": "bun run --filter '*' test",
+    "lint": "bun run --filter '*' lint",
+    "format": "prettier --write '**/*.{ts,tsx,json,css,md}' --list-different --ignore-path .prettierignore"
+  },
+  "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^6.0.2",
+    "@types/bun": "^1.3.11",
+    "@types/node": "^25.5.0",
+    "prettier": "^3.8.1",
+    "typescript": "^5.9.3"
+  }
+}

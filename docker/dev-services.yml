@@ -1,0 +1,17 @@
+# LIMEN OS — Dev services shorthand
+#
+# This is a convenience shim. The real definitions live in stack.yml.
+# Equivalent to:
+#   docker compose -f docker/stack.yml --profile sinergym --profile smartcities up -d
+#
+# Use the Makefile targets:
+#   make dev-services-up      # core services only
+#   make dev-sim-up           # core + sinergym + smartcities
+#
+# Or compose directly with any profile combination:
+#   docker compose -f docker/stack.yml --profile sinergym up -d
+#   docker compose -f docker/stack.yml --profile smartcities up -d
+#   docker compose -f docker/stack.yml --profile agentflow up -d
+#   docker compose -f docker/stack.yml --profile portainer --profile grafana up -d
+#
+# See docker/stack.yml for the full service list and available profiles.

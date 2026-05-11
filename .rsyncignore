@@ -1,0 +1,57 @@
+# LIMEN OS — rsync / archive exclude list
+# Used by scripts/archive.sh and scripts/sync.sh
+.local/
+# ── Rust build artifacts ──────────────────────────────────────────────────────
+target/
+
+# ── JS / Node ─────────────────────────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+
+# ── Built frontend (exclude from source sync; include for preview sync) ───────
+apps/shell/dist/
+packages/*/dist/
+
+# ── Flutter / Dart ────────────────────────────────────────────────────────────
+.dart_tool/
+.pub-cache/
+apps/mobile/build/
+apps/mobile/.flutter-plugins
+apps/mobile/.flutter-plugins-dependencies
+
+# ── Android / iOS ─────────────────────────────────────────────────────────────
+apps/mobile/android/
+apps/mobile/ios/
+apps/mobile/linux/
+apps/mobile/windows/
+apps/mobile/macos/
+android/
+ios/
+
+# ── Go ────────────────────────────────────────────────────────────────────────
+vendor/
+
+# ── Editors & OS ─────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# ── Logs & temp ───────────────────────────────────────────────────────────────
+*.log
+*.tmp
+*.pid
+/tmp/
+
+# ── Secrets (never sync) ──────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.p12

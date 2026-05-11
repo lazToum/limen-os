@@ -1,0 +1,60 @@
+[[bin]]
+name = "synapsd"
+path = "src/bin/synapsd.rs"
+
+[package]
+name = "limen-core"
+description = "LIMEN OS core daemon — IPC, session management, WID events, WASM plugins"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[features]
+default = ["ipc", "plugins"]
+ipc = ["dep:zbus"]
+plugins = ["dep:wasmtime"]
+
+[dependencies]
+# Workspace
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+chrono.workspace = true
+dashmap.workspace = true
+parking_lot.workspace = true
+futures.workspace = true
+
+# IPC
+zbus = { workspace = true, optional = true }
+
+# WASM plugin host
+wasmtime = { workspace = true, optional = true }
+
+# Companion WebSocket server
+axum.workspace = true
+tower.workspace = true
+tower-http.workspace = true
+base64 = "0.22.1"
+
+# AI orchestration (router, intent, context)
+limen-ai = { path = "../limen-ai" }
+
+# Unix socket IPC
+tokio-stream.workspace = true
+wid = { git = "https://github.com/waldiez/wid", package = "waldiez-wid" }
+
+# AgentFlow MQTT bridge
+rumqttc.workspace = true
+
+# Voice relay transcription (Whisper HTTP) + relay proxy
+reqwest = { workspace = true, features = ["json", "multipart"] }
+url = "2.5"
+urlencoding = "2.1"
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["test-util"] }

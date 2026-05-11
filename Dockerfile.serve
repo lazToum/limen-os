@@ -1,0 +1,20 @@
+FROM oven/bun:1-alpine
+WORKDIR /opt/limen-os
+
+# Server script
+COPY scripts/serve.ts ./scripts/
+
+# Built shell SPA — must be pre-built locally before image build:
+#   cd apps/shell && bun run build
+COPY apps/shell/dist ./apps/shell/dist/
+
+# Optional: Waldiez Player dist
+# COPY player/dist ./player/dist/
+# Optional: Waldiez staging
+# COPY waldiez-staging ./waldiez-staging/
+
+ENV PORT=1420
+ENV HOST=0.0.0.0
+
+EXPOSE 1420
+CMD ["bun", "run", "scripts/serve.ts"]

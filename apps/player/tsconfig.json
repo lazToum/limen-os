@@ -1,0 +1,21 @@
+{
+    "files": [],
+    "compilerOptions": {
+        "forceConsistentCasingInFileNames": true,
+        "verbatimModuleSyntax": true,
+        "strict": true,
+        "noEmit": true,
+        "paths": {
+            "@/*": ["./src/*"],
+            "@waldiez/editor-core": ["./packages/editor-core/src/index.ts"]
+        }
+    },
+    "references": [
+        {
+            "path": "./tsconfig.app.json"
+        },
+        {
+            "path": "./tsconfig.node.json"
+        }
+    ]
+}
