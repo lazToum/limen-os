@@ -14,7 +14,7 @@ version = "0.1.0"
 edition = "2024"
 authors = ["Lazaros Toumanidis <laztoum@protonmail.com>"]
 license = "MIT OR Apache-2.0"
-repository = "https://gitlab.com/what-if/limen-os"
+repository = "https://github.com/lazToum/limen-os"
 
 [workspace.dependencies]
 # Async runtime

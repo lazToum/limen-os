@@ -2,7 +2,7 @@
 # cspell: disable
 .DEFAULT_GOAL := help
 
-.PHONY: help all setup vendor dev dev-full build check lint format test precommit smoke push \
+.PHONY: help all setup vendor dev dev-full build check lint format test precommit smoke push git-push git-push-github git-push-gitlab \
         packages-build shell-dev shell-build shell-check \
         bundle-linux bundle-appimage bundle-deb bundle-tui \
         tui-dev tui-build tui-check \
@@ -357,6 +357,15 @@ mock-agents:
 # ─────────────────────────────────────────────────────────────────────────────
 # EC2 / REMOTE PUSH
 # ─────────────────────────────────────────────────────────────────────────────
+
+## git-push: Push to GitHub (primary) + GitLab (mirror)
+git-push: git-push-github git-push-gitlab
+
+git-push-github:
+	git push origin main
+
+git-push-gitlab:
+	git push gitlab main
 
 ## push: Smoke-test → build → rsync to EC2 (first run bootstraps, subsequent reloads)
 push:
