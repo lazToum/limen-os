@@ -30,6 +30,7 @@ scripts/bun.lock
 
 # ── Flutter web build (generated, embedded in shell public/) ──────────────────
 apps/shell/public/mobile/
+apps/shell/public/player/
 
 # ── Flutter / Dart ─────────────────────────────────────────────────────────────
 apps/mobile/.dart_tool/
