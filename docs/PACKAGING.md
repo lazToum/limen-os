@@ -222,7 +222,7 @@ source "$HOME/.bashrc"
 cargo install tauri-cli --version "^2" --locked
 
 # Clone + build
-git clone https://github.com/waldiez/limen-os.git
+git clone https://github.com/lazToum/limen-os.git
 cd limen-os
 bun install
 make packages-build
@@ -282,7 +282,7 @@ mkdir actions-runner && cd actions-runner
 curl -o actions-runner-linux-arm64.tar.gz -L \
   https://github.com/actions/runner/releases/download/v2.323.0/actions-runner-linux-arm64-2.323.0.tar.gz
 tar xzf actions-runner-linux-arm64.tar.gz
-./config.sh --url https://github.com/waldiez/limen-os --token YOUR_TOKEN
+./config.sh --url https://github.com/lazToum/limen-os --token YOUR_TOKEN
 sudo ./svc.sh install && sudo ./svc.sh start
 ```
 
@@ -352,7 +352,7 @@ curl -fsSL https://bun.sh/install | bash
 cargo install tauri-cli --version "^2" --locked
 
 # Clone repo
-git clone https://github.com/waldiez/limen-os.git
+git clone https://github.com/lazToum/limen-os.git
 cd limen-os
 bun install && make packages-build
 
@@ -449,7 +449,7 @@ winget install NSIS.NSIS
 # Or: https://nsis.sourceforge.io/Download
 
 # Clone and build:
-git clone https://github.com/waldiez/limen-os.git
+git clone https://github.com/lazToum/limen-os.git
 cd limen-os
 bun install
 

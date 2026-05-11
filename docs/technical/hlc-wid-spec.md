@@ -2,7 +2,7 @@
 
 **WID (Waldiez/LIMEN Identifier)** is a time-ordered, human-readable, collision-resistant identifier format designed for distributed IoT and agent systems.
 
-This document reflects the official specification from the [WID Repository](../../../wid/spec/SPEC.md).
+This document reflects the official specification from the [WID Repository](https://github.com/waldiez/wid).
 
 ---
 

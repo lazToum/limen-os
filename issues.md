@@ -10,7 +10,7 @@
 **Status**: Fixed (2026-03-14) — but needs verification in Tauri mode
 **Symptom**: You can see Limen's reply in the notification tray but cannot hear it.
 **Root cause**: `window.speechSynthesis.speak()` was only wired as a listener for the Tauri event
-`limen://tts/speak`. In browser/web mode (io.what-if.io) Tauri events never fire. In Tauri mode,
+`limen://tts/speak`. In browser/web mode (limen-os.io) Tauri events never fire. In Tauri mode,
 `invoke("voice_command")` returns the response text but the `.then()` handler only pushed a
 notification — it never called `speechSynthesis.speak()` directly.
 **Fix applied**: `App.tsx` — in `voice_command.then()` handler: cancel any queued utterance, build a

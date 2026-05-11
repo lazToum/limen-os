@@ -35,7 +35,7 @@ xcode-select --install   # Command Line Tools only needed
 
 ```bash
 # 1. Clone
-git clone https://github.com/waldiez/limen-os
+git clone https://github.com/lazToum/limen-os
 cd limen-os
 
 # 2. Install everything (JS deps + Tauri CLI + Flutter deps + workspace packages)

@@ -191,7 +191,7 @@ Plugins run in a Wasmtime sandbox with capability-based permissions. They can't 
 Everything you need in one command:
 
 ```bash
-git clone https://github.com/waldiez/limen-os
+git clone https://github.com/lazToum/limen-os
 cd limen-os
 make setup   # one-time: installs Tauri CLI, Flutter deps, JS packages
 make dev     # starts Tauri shell + TUI watcher

@@ -246,10 +246,10 @@ LIMEN_WEBRTC_STUN=stun:stun.l.google.com:19302
 
 ---
 
-## Related Projects (in this monorepo)
+## Related Projects
 
-- **`../wef`** — Fall detection: reuse MQTT alerts → Limen notification widget
-- **`../wid`** — WID identifier: used for all event/session IDs throughout Limen OS
+- **[waldiez/wid](https://github.com/waldiez/wid)** — HLC-WID identifiers: used for all event/session IDs throughout Limen OS
+- **[waldiez/player](https://github.com/waldiez/player)** — Media player; upstream for `apps/player/`
 
 ---
 
